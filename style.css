@@ -276,25 +276,37 @@ textarea:focus {
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 18px;
+  gap: 10px;
 }
 
 .movie-card {
   overflow: hidden;
   display: grid;
-  grid-template-rows: 310px minmax(0, 1fr);
-  min-height: 540px;
-  background: var(--panel);
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 124px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(217, 221, 216, 0.9);
   border-radius: 8px;
-  box-shadow: 0 14px 34px rgba(37, 43, 50, 0.08);
+  box-shadow: 0 10px 24px rgba(37, 43, 50, 0.07);
+  cursor: pointer;
+}
+
+.movie-card:hover,
+.movie-card:focus-visible {
+  border-color: rgba(47, 111, 115, 0.5);
+  box-shadow: 0 14px 30px rgba(37, 43, 50, 0.1);
+  outline: 0;
 }
 
 .poster-frame {
   position: relative;
   overflow: hidden;
+  width: 100%;
+  min-height: 104px;
   background: #27313b;
+  border-radius: 6px;
 }
 
 .poster-frame img {
@@ -325,6 +337,11 @@ textarea:focus {
   border-radius: 8px;
 }
 
+.movie-card .poster-placeholder::before,
+.detail-poster-frame .poster-placeholder::before {
+  inset: 12px;
+}
+
 .poster-placeholder span,
 .empty-poster span {
   position: relative;
@@ -334,6 +351,17 @@ textarea:focus {
   aspect-ratio: 1;
   border: 2px solid rgba(255, 255, 255, 0.55);
   border-radius: 50%;
+}
+
+.movie-card .poster-placeholder span {
+  width: 38px;
+}
+
+.movie-card .poster-placeholder span::before {
+  margin-left: 4px;
+  border-top-width: 9px;
+  border-bottom-width: 9px;
+  border-left-width: 14px;
 }
 
 .poster-placeholder span::before,
@@ -349,14 +377,21 @@ textarea:focus {
 
 .card-body {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 12px;
-  padding: 18px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
+
+.card-main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
 }
 
 .card-title {
   margin: 0;
-  font-size: 1.24rem;
+  font-size: 1.05rem;
   line-height: 1.25;
   letter-spacing: 0;
   overflow-wrap: anywhere;
@@ -384,17 +419,21 @@ textarea:focus {
 .review-preview {
   margin: 0;
   color: #4e5865;
-  line-height: 1.55;
+  line-height: 1.45;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 2;
 }
 
 .card-actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+}
+
+.muted-inline {
+  color: #9ca3ad;
 }
 
 .secondary-button {
@@ -466,6 +505,10 @@ textarea:focus {
   box-shadow: var(--shadow);
 }
 
+.detail-modal {
+  width: min(860px, 100%);
+}
+
 .modal-header {
   position: sticky;
   top: 0;
@@ -510,6 +553,38 @@ small {
   font-size: 0.78rem;
 }
 
+.poster-field {
+  display: grid;
+  gap: 12px;
+}
+
+.poster-field input[type="file"] {
+  height: auto;
+  min-height: 46px;
+  padding: 10px 13px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink);
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.help-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .form-error {
   min-height: 20px;
   margin: 0;
@@ -522,6 +597,41 @@ small {
   justify-content: flex-end;
   gap: 10px;
   padding-top: 2px;
+}
+
+.detail-body {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: 22px;
+  padding: 22px;
+}
+
+.detail-poster-frame {
+  min-height: 360px;
+}
+
+.detail-content {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+}
+
+.detail-meta {
+  font-size: 0.95rem;
+}
+
+.detail-review {
+  margin: 0;
+  color: #3f4a58;
+  font-size: 1rem;
+  line-height: 1.78;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.detail-actions {
+  padding: 0 22px 22px;
 }
 
 .is-hidden {
@@ -572,13 +682,33 @@ small {
     padding: 18px;
   }
 
-  .movie-grid {
+  .movie-card {
+    grid-template-columns: 70px minmax(0, 1fr);
+    gap: 12px;
+    min-height: 118px;
+  }
+
+  .poster-frame {
+    min-height: 96px;
+  }
+
+  .card-body {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .card-actions {
+    justify-content: flex-start;
+  }
+
+  .detail-body {
     grid-template-columns: 1fr;
   }
 
-  .movie-card {
-    grid-template-rows: 260px minmax(0, 1fr);
-    min-height: 480px;
+  .detail-poster-frame {
+    width: min(240px, 100%);
+    min-height: 340px;
   }
 
   .modal-backdrop {

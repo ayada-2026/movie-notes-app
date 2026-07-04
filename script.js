@@ -1,6 +1,9 @@
 const CANONICAL_HOST = "movie-notes-app-ecru.vercel.app";
 const SUPABASE_URL = "https://zjolzipsoqsczilhgqwq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KYwwO9ZHOAg4T45dzCAXsg_fJbShoXd";
+const STORAGE_BUCKET = "movie-posters";
+const MAX_POSTER_FILE_SIZE = 5 * 1024 * 1024;
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
 
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
@@ -31,7 +34,16 @@ const elements = {
   authView: document.querySelector("#authView"),
   cancelButton: document.querySelector("#cancelButton"),
   clearSearchButton: document.querySelector("#clearSearchButton"),
+  closeDetailButton: document.querySelector("#closeDetailButton"),
   closeModalButton: document.querySelector("#closeModalButton"),
+  detailDeleteButton: document.querySelector("#detailDeleteButton"),
+  detailEditButton: document.querySelector("#detailEditButton"),
+  detailModal: document.querySelector("#detailModal"),
+  detailPoster: document.querySelector("#detailPoster"),
+  detailReleaseYear: document.querySelector("#detailReleaseYear"),
+  detailReview: document.querySelector("#detailReview"),
+  detailTitle: document.querySelector("#detailTitle"),
+  detailWatchedDate: document.querySelector("#detailWatchedDate"),
   emailInput: document.querySelector("#emailInput"),
   emptyAddButton: document.querySelector("#emptyAddButton"),
   emptyState: document.querySelector("#emptyState"),
@@ -42,8 +54,13 @@ const elements = {
   movieGrid: document.querySelector("#movieGrid"),
   movieId: document.querySelector("#movieId"),
   passwordInput: document.querySelector("#passwordInput"),
+  posterCurrentValue: document.querySelector("#posterCurrentValue"),
+  posterFileInput: document.querySelector("#posterFileInput"),
+  posterHelp: document.querySelector("#posterHelp"),
   posterInput: document.querySelector("#posterInput"),
   releaseYearInput: document.querySelector("#releaseYearInput"),
+  removePosterField: document.querySelector("#removePosterField"),
+  removePosterInput: document.querySelector("#removePosterInput"),
   resultSummary: document.querySelector("#resultSummary"),
   reviewInput: document.querySelector("#reviewInput"),
   searchInput: document.querySelector("#searchInput"),
@@ -57,6 +74,9 @@ const elements = {
 let movies = [];
 let session = null;
 let isSaving = false;
+let selectedDetailMovieId = "";
+
+const posterUrlCache = new Map();
 
 function normalizeText(value) {
   return value.trim().replace(/\s+/g, " ");
@@ -102,20 +122,63 @@ function mapMovieFromDb(row) {
     title: row.title,
     releaseYear: row.release_year,
     watchedDate: row.watched_date,
-    review: row.review,
+    review: row.review || "",
     poster: row.poster || "",
+    posterUrl: "",
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
-function movieToDbPayload() {
+function isExternalPoster(value) {
+  return /^https?:\/\//i.test(value || "");
+}
+
+function isStoragePoster(value) {
+  return Boolean(value) && !isExternalPoster(value);
+}
+
+async function resolvePosterUrl(poster) {
+  if (!poster) {
+    return "";
+  }
+
+  if (isExternalPoster(poster)) {
+    return poster;
+  }
+
+  if (posterUrlCache.has(poster)) {
+    return posterUrlCache.get(poster);
+  }
+
+  const { data, error } = await supabaseClient.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUrl(poster, SIGNED_URL_TTL_SECONDS);
+
+  if (error) {
+    return "";
+  }
+
+  posterUrlCache.set(poster, data.signedUrl);
+  return data.signedUrl;
+}
+
+async function hydratePosterUrls(items) {
+  return Promise.all(
+    items.map(async (movie) => ({
+      ...movie,
+      posterUrl: await resolvePosterUrl(movie.poster),
+    })),
+  );
+}
+
+function movieToDbPayload(posterValue) {
   return {
     title: normalizeText(elements.titleInput.value),
     release_year: Number(elements.releaseYearInput.value),
     watched_date: elements.watchedDateInput.value,
     review: elements.reviewInput.value.trim(),
-    poster: elements.posterInput.value.trim() || null,
+    poster: posterValue || null,
   };
 }
 
@@ -149,6 +212,7 @@ function renderAuthState() {
     movies = [];
     renderMovies();
     closeModal();
+    closeDetail();
     setStatus("");
   }
 }
@@ -177,27 +241,40 @@ function renderMovies() {
   }
 }
 
-function renderMovieCard(movie) {
+function renderPosterMarkup(movie, className = "poster-frame") {
   const safeTitle = escapeHtml(movie.title);
-  const safeReview = escapeHtml(movie.review);
-  const safePoster = movie.poster ? escapeHtml(movie.poster) : "";
-  const poster = safePoster
-    ? `<img src="${safePoster}" alt="${safeTitle} 포스터" loading="lazy" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.remove('is-hidden');" />
-       <div class="poster-placeholder is-hidden" aria-hidden="true"><span></span></div>`
-    : `<div class="poster-placeholder" aria-hidden="true"><span></span></div>`;
+  const safePoster = movie.posterUrl ? escapeHtml(movie.posterUrl) : "";
+
+  if (!safePoster) {
+    return `<div class="${className}"><div class="poster-placeholder" aria-hidden="true"><span></span></div></div>`;
+  }
 
   return `
-    <article class="movie-card" data-id="${escapeHtml(movie.id)}">
-      <div class="poster-frame">
-        ${poster}
-      </div>
+    <div class="${className}">
+      <img src="${safePoster}" alt="${safeTitle} 포스터" loading="lazy" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.remove('is-hidden');" />
+      <div class="poster-placeholder is-hidden" aria-hidden="true"><span></span></div>
+    </div>
+  `;
+}
+
+function renderMovieCard(movie) {
+  const safeTitle = escapeHtml(movie.title);
+  const safeReview = movie.review
+    ? escapeHtml(movie.review)
+    : '<span class="muted-inline">감상이 비어 있습니다.</span>';
+
+  return `
+    <article class="movie-card" data-id="${escapeHtml(movie.id)}" tabindex="0" role="button" aria-label="${safeTitle} 자세히 보기">
+      ${renderPosterMarkup(movie, "poster-frame")}
       <div class="card-body">
-        <h2 class="card-title">${safeTitle}</h2>
-        <div class="card-meta">
-          <span class="meta-pill">${movie.releaseYear}</span>
-          <span>${formatDate(movie.watchedDate)}</span>
+        <div class="card-main">
+          <h2 class="card-title">${safeTitle}</h2>
+          <div class="card-meta">
+            <span class="meta-pill">${movie.releaseYear}</span>
+            <span>${formatDate(movie.watchedDate)}</span>
+          </div>
+          <p class="review-preview">${safeReview}</p>
         </div>
-        <p class="review-preview">${safeReview}</p>
         <div class="card-actions">
           <button class="secondary-button" type="button" data-action="edit">수정</button>
           <button class="secondary-button danger-button" type="button" data-action="delete">삭제</button>
@@ -225,9 +302,27 @@ async function loadMoviesFromDb() {
     return;
   }
 
-  movies = data.map(mapMovieFromDb);
+  movies = await hydratePosterUrls(data.map(mapMovieFromDb));
   renderMovies();
   setStatus("");
+}
+
+function updatePosterHelp(movie = null) {
+  const hasPoster = Boolean(movie?.poster);
+  const currentIsStorageFile = isStoragePoster(movie?.poster);
+
+  elements.removePosterField.classList.toggle("is-hidden", !hasPoster);
+  elements.removePosterInput.checked = false;
+
+  if (!hasPoster) {
+    elements.posterHelp.textContent =
+      "파일을 첨부하거나 URL을 입력할 수 있습니다. 파일은 비공개 저장소에 보관됩니다.";
+    return;
+  }
+
+  elements.posterHelp.textContent = currentIsStorageFile
+    ? "현재 첨부된 포스터가 있습니다. 새 파일을 고르면 교체되고, URL을 입력하면 URL 포스터로 바뀝니다."
+    : "현재 URL 포스터를 사용 중입니다. 새 파일을 고르면 첨부 포스터로 바뀝니다.";
 }
 
 function openModal(movie = null) {
@@ -240,12 +335,16 @@ function openModal(movie = null) {
     elements.titleInput.value = movie.title;
     elements.releaseYearInput.value = movie.releaseYear;
     elements.watchedDateInput.value = movie.watchedDate;
-    elements.posterInput.value = movie.poster || "";
+    elements.posterCurrentValue.value = movie.poster || "";
+    elements.posterInput.value = isExternalPoster(movie.poster) ? movie.poster : "";
     elements.reviewInput.value = movie.review;
+    updatePosterHelp(movie);
   } else {
     elements.modalTitle.textContent = "새 영화 기록";
     elements.movieId.value = "";
+    elements.posterCurrentValue.value = "";
     elements.watchedDateInput.value = new Date().toISOString().slice(0, 10);
+    updatePosterHelp();
   }
 
   elements.modal.classList.remove("is-hidden");
@@ -257,18 +356,48 @@ function closeModal() {
   setSavingState(false);
 }
 
+function openDetail(movie) {
+  selectedDetailMovieId = movie.id;
+  elements.detailTitle.textContent = movie.title;
+  elements.detailReleaseYear.textContent = movie.releaseYear;
+  elements.detailWatchedDate.textContent = formatDate(movie.watchedDate);
+  elements.detailReview.textContent = movie.review || "감상이 비어 있습니다.";
+  elements.detailPoster.innerHTML = renderPosterMarkup(movie, "poster-frame detail-poster-frame");
+  elements.detailModal.classList.remove("is-hidden");
+}
+
+function closeDetail() {
+  selectedDetailMovieId = "";
+  elements.detailModal.classList.add("is-hidden");
+}
+
 function validateForm() {
   const title = normalizeText(elements.titleInput.value);
   const releaseYear = Number(elements.releaseYearInput.value);
   const watchedDate = elements.watchedDateInput.value;
-  const review = elements.reviewInput.value.trim();
+  const posterFile = elements.posterFileInput.files[0];
+  const posterUrl = elements.posterInput.value.trim();
 
-  if (!title || !releaseYear || !watchedDate || !review) {
-    return "제목, 출시년도, 본 날짜, 감상을 모두 입력해주세요.";
+  if (!title || !releaseYear || !watchedDate) {
+    return "제목, 출시년도, 본 날짜를 입력해주세요.";
   }
 
   if (releaseYear < 1888 || releaseYear > 2100) {
     return "출시년도는 1888년부터 2100년 사이로 입력해주세요.";
+  }
+
+  if (posterUrl && !isExternalPoster(posterUrl)) {
+    return "포스터 URL은 http:// 또는 https://로 시작해야 합니다.";
+  }
+
+  if (posterFile) {
+    if (!posterFile.type.startsWith("image/")) {
+      return "포스터는 이미지 파일만 첨부할 수 있습니다.";
+    }
+
+    if (posterFile.size > MAX_POSTER_FILE_SIZE) {
+      return "포스터 파일은 5MB 이하로 첨부해주세요.";
+    }
   }
 
   return "";
@@ -295,6 +424,61 @@ async function handleSignOut() {
   await supabaseClient.auth.signOut();
 }
 
+function getPosterExtension(file) {
+  const filenameExtension = file.name.split(".").pop()?.toLowerCase();
+  const allowed = ["jpg", "jpeg", "png", "webp", "gif"];
+
+  if (filenameExtension && allowed.includes(filenameExtension)) {
+    return filenameExtension;
+  }
+
+  return file.type.split("/")[1] || "jpg";
+}
+
+async function uploadPosterFile(file) {
+  const extension = getPosterExtension(file);
+  const randomName =
+    crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const path = `${session.user.id}/${randomName}.${extension}`;
+
+  const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    contentType: file.type,
+    upsert: false,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  posterUrlCache.delete(path);
+  return path;
+}
+
+async function resolvePosterValueBeforeSave() {
+  const posterFile = elements.posterFileInput.files[0];
+  const posterUrl = elements.posterInput.value.trim();
+  const currentPoster = elements.posterCurrentValue.value.trim();
+
+  if (posterFile) {
+    return uploadPosterFile(posterFile);
+  }
+
+  if (posterUrl) {
+    return posterUrl;
+  }
+
+  if (elements.removePosterInput.checked) {
+    return "";
+  }
+
+  if (isStoragePoster(currentPoster)) {
+    return currentPoster;
+  }
+
+  return "";
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
 
@@ -311,8 +495,19 @@ async function handleSubmit(event) {
   setSavingState(true);
   setFormError("");
 
+  let posterValue = "";
+
+  try {
+    posterValue = await resolvePosterValueBeforeSave();
+  } catch (_error) {
+    setSavingState(false);
+    setFormError("포스터를 업로드하지 못했습니다. 파일을 확인해주세요.");
+    return;
+  }
+
   const id = elements.movieId.value;
-  const payload = movieToDbPayload();
+  const previousMovie = id ? movies.find((movie) => movie.id === id) : null;
+  const payload = movieToDbPayload(posterValue);
   const query = id
     ? supabaseClient
         .from("movie_notes")
@@ -330,11 +525,25 @@ async function handleSubmit(event) {
   setSavingState(false);
 
   if (error) {
+    if (isStoragePoster(posterValue) && posterValue !== previousMovie?.poster) {
+      await supabaseClient.storage.from(STORAGE_BUCKET).remove([posterValue]);
+      posterUrlCache.delete(posterValue);
+    }
+
     setFormError("저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
     return;
   }
 
-  const nextMovie = mapMovieFromDb(data);
+  const [nextMovie] = await hydratePosterUrls([mapMovieFromDb(data)]);
+
+  if (
+    previousMovie &&
+    isStoragePoster(previousMovie.poster) &&
+    previousMovie.poster !== nextMovie.poster
+  ) {
+    await supabaseClient.storage.from(STORAGE_BUCKET).remove([previousMovie.poster]);
+    posterUrlCache.delete(previousMovie.poster);
+  }
 
   if (id) {
     movies = movies.map((movie) => (movie.id === id ? nextMovie : movie));
@@ -344,18 +553,47 @@ async function handleSubmit(event) {
 
   renderMovies();
   closeModal();
+
+  if (selectedDetailMovieId === nextMovie.id) {
+    openDetail(nextMovie);
+  }
+}
+
+async function deleteMovie(movie) {
+  const { error } = await supabaseClient.from("movie_notes").delete().eq("id", movie.id);
+
+  if (error) {
+    setStatus("삭제하지 못했습니다");
+    return false;
+  }
+
+  if (isStoragePoster(movie.poster)) {
+    await supabaseClient.storage.from(STORAGE_BUCKET).remove([movie.poster]);
+    posterUrlCache.delete(movie.poster);
+  }
+
+  movies = movies.filter((item) => item.id !== movie.id);
+  renderMovies();
+  setStatus("");
+  return true;
 }
 
 async function handleGridClick(event) {
-  const button = event.target.closest("button[data-action]");
   const card = event.target.closest(".movie-card");
 
-  if (!button || !card || !session?.user) {
+  if (!card || !session?.user) {
     return;
   }
 
   const movie = movies.find((item) => item.id === card.dataset.id);
   if (!movie) {
+    return;
+  }
+
+  const button = event.target.closest("button[data-action]");
+
+  if (!button) {
+    openDetail(movie);
     return;
   }
 
@@ -369,28 +607,80 @@ async function handleGridClick(event) {
     return;
   }
 
-  const { error } = await supabaseClient.from("movie_notes").delete().eq("id", movie.id);
+  await deleteMovie(movie);
+}
 
-  if (error) {
-    setStatus("삭제하지 못했습니다");
+function handleGridKeydown(event) {
+  if (event.key !== "Enter" && event.key !== " ") {
     return;
   }
 
-  movies = movies.filter((item) => item.id !== movie.id);
-  renderMovies();
-  setStatus("");
+  const card = event.target.closest(".movie-card");
+  if (!card || event.target.closest("button")) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const movie = movies.find((item) => item.id === card.dataset.id);
+  if (movie) {
+    openDetail(movie);
+  }
 }
 
 function handleBackdropClick(event) {
   if (event.target === elements.modal) {
     closeModal();
   }
+
+  if (event.target === elements.detailModal) {
+    closeDetail();
+  }
 }
 
 function handleKeydown(event) {
-  if (event.key === "Escape" && !elements.modal.classList.contains("is-hidden")) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  if (!elements.modal.classList.contains("is-hidden")) {
     closeModal();
   }
+
+  if (!elements.detailModal.classList.contains("is-hidden")) {
+    closeDetail();
+  }
+}
+
+function getSelectedDetailMovie() {
+  return movies.find((movie) => movie.id === selectedDetailMovieId);
+}
+
+async function handleDetailDelete() {
+  const movie = getSelectedDetailMovie();
+  if (!movie) {
+    return;
+  }
+
+  const confirmed = confirm(`"${movie.title}" 기록을 삭제할까요?`);
+  if (!confirmed) {
+    return;
+  }
+
+  const deleted = await deleteMovie(movie);
+  if (deleted) {
+    closeDetail();
+  }
+}
+
+function handleDetailEdit() {
+  const movie = getSelectedDetailMovie();
+  if (!movie) {
+    return;
+  }
+
+  closeDetail();
+  openModal(movie);
 }
 
 async function initializeApp() {
@@ -432,7 +722,12 @@ elements.closeModalButton.addEventListener("click", closeModal);
 elements.cancelButton.addEventListener("click", closeModal);
 elements.form.addEventListener("submit", handleSubmit);
 elements.movieGrid.addEventListener("click", handleGridClick);
+elements.movieGrid.addEventListener("keydown", handleGridKeydown);
 elements.modal.addEventListener("click", handleBackdropClick);
+elements.detailModal.addEventListener("click", handleBackdropClick);
+elements.closeDetailButton.addEventListener("click", closeDetail);
+elements.detailDeleteButton.addEventListener("click", handleDetailDelete);
+elements.detailEditButton.addEventListener("click", handleDetailEdit);
 elements.searchInput.addEventListener("input", renderMovies);
 elements.signOutButton.addEventListener("click", handleSignOut);
 elements.sortSelect.addEventListener("change", renderMovies);
