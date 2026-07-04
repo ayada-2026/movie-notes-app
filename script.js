@@ -4,6 +4,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KYwwO9ZHOAg4T45dzCAXsg_fJbShoXd
 const STORAGE_BUCKET = "movie-posters";
 const MAX_POSTER_FILE_SIZE = 5 * 1024 * 1024;
 const SIGNED_URL_TTL_SECONDS = 60 * 60;
+const MOVIES_PER_PAGE = 20;
 
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
@@ -53,10 +54,14 @@ const elements = {
   modalTitle: document.querySelector("#modalTitle"),
   movieGrid: document.querySelector("#movieGrid"),
   movieId: document.querySelector("#movieId"),
+  nextPageButton: document.querySelector("#nextPageButton"),
+  pageButtons: document.querySelector("#pageButtons"),
   passwordInput: document.querySelector("#passwordInput"),
+  pagination: document.querySelector("#pagination"),
   posterCurrentValue: document.querySelector("#posterCurrentValue"),
   posterFileInput: document.querySelector("#posterFileInput"),
   posterHelp: document.querySelector("#posterHelp"),
+  prevPageButton: document.querySelector("#prevPageButton"),
   posterInput: document.querySelector("#posterInput"),
   releaseYearInput: document.querySelector("#releaseYearInput"),
   removePosterField: document.querySelector("#removePosterField"),
@@ -75,6 +80,7 @@ let movies = [];
 let session = null;
 let isSaving = false;
 let selectedDetailMovieId = "";
+let currentPage = 1;
 
 const posterUrlCache = new Map();
 
@@ -96,6 +102,31 @@ function getVisibleMovies() {
 
       return a.watchedDate.localeCompare(b.watchedDate) * multiplier;
     });
+}
+
+function getPageCount(totalItems) {
+  return Math.max(1, Math.ceil(totalItems / MOVIES_PER_PAGE));
+}
+
+function clampCurrentPage(totalItems) {
+  currentPage = Math.min(Math.max(currentPage, 1), getPageCount(totalItems));
+}
+
+function getPageItems(items) {
+  const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
+  return items.slice(startIndex, startIndex + MOVIES_PER_PAGE);
+}
+
+function getPaginationRange(pageCount) {
+  const pages = [];
+  const start = Math.max(1, currentPage - 2);
+  const end = Math.min(pageCount, currentPage + 2);
+
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+
+  return pages;
 }
 
 function formatDate(value) {
@@ -220,15 +251,27 @@ function renderAuthState() {
 function renderMovies() {
   const visibleMovies = getVisibleMovies();
   const hasSearch = elements.searchInput.value.trim().length > 0;
+  clampCurrentPage(visibleMovies.length);
+
+  const pageCount = getPageCount(visibleMovies.length);
+  const pageMovies = getPageItems(visibleMovies);
+  const firstVisibleNumber =
+    visibleMovies.length === 0 ? 0 : (currentPage - 1) * MOVIES_PER_PAGE + 1;
+  const lastVisibleNumber = Math.min(currentPage * MOVIES_PER_PAGE, visibleMovies.length);
+  const rangeText =
+    visibleMovies.length > MOVIES_PER_PAGE
+      ? ` · ${firstVisibleNumber}-${lastVisibleNumber} 표시`
+      : "";
 
   elements.resultSummary.textContent = hasSearch
-    ? `${visibleMovies.length}개의 검색 결과`
-    : `${movies.length}개의 기록`;
+    ? `${visibleMovies.length}개의 검색 결과${rangeText}`
+    : `${movies.length}개의 기록${rangeText}`;
   elements.clearSearchButton.disabled = !hasSearch;
 
-  elements.movieGrid.innerHTML = visibleMovies.map(renderMovieCard).join("");
+  elements.movieGrid.innerHTML = pageMovies.map(renderMovieCard).join("");
   elements.emptyState.classList.toggle("is-hidden", visibleMovies.length > 0);
   elements.movieGrid.classList.toggle("is-hidden", visibleMovies.length === 0);
+  renderPagination(pageCount, visibleMovies.length);
 
   if (visibleMovies.length === 0 && hasSearch) {
     elements.emptyState.querySelector("h2").textContent = "검색 결과가 없습니다";
@@ -239,6 +282,59 @@ function renderMovies() {
     elements.emptyState.querySelector("p").textContent =
       "처음 남기고 싶은 영화 한 편을 추가해보세요.";
   }
+}
+
+function renderPagination(pageCount, totalItems) {
+  const shouldShow = totalItems > MOVIES_PER_PAGE;
+  elements.pagination.classList.toggle("is-hidden", !shouldShow);
+
+  if (!shouldShow) {
+    elements.pageButtons.innerHTML = "";
+    return;
+  }
+
+  const pages = getPaginationRange(pageCount);
+  const leadingButton =
+    pages[0] > 1
+      ? `<button class="page-button" type="button" data-page="1">1</button>`
+      : "";
+  const leadingGap = pages[0] > 2 ? `<span class="page-gap">...</span>` : "";
+  const trailingGap =
+    pages[pages.length - 1] < pageCount - 1 ? `<span class="page-gap">...</span>` : "";
+  const trailingButton =
+    pages[pages.length - 1] < pageCount
+      ? `<button class="page-button" type="button" data-page="${pageCount}">${pageCount}</button>`
+      : "";
+  const pageButtons = pages
+    .map(
+      (page) => `
+        <button
+          class="page-button${page === currentPage ? " is-active" : ""}"
+          type="button"
+          data-page="${page}"
+          ${page === currentPage ? 'aria-current="page"' : ""}
+        >
+          ${page}
+        </button>
+      `,
+    )
+    .join("");
+
+  elements.pageButtons.innerHTML = `${leadingButton}${leadingGap}${pageButtons}${trailingGap}${trailingButton}`;
+  elements.prevPageButton.disabled = currentPage === 1;
+  elements.nextPageButton.disabled = currentPage === pageCount;
+}
+
+function changePage(nextPage) {
+  const pageCount = getPageCount(getVisibleMovies().length);
+  currentPage = Math.min(Math.max(nextPage, 1), pageCount);
+  renderMovies();
+  elements.resultSummary.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function resetPageAndRender() {
+  currentPage = 1;
+  renderMovies();
 }
 
 function renderPosterMarkup(movie, className = "poster-frame") {
@@ -549,6 +645,7 @@ async function handleSubmit(event) {
     movies = movies.map((movie) => (movie.id === id ? nextMovie : movie));
   } else {
     movies = [nextMovie, ...movies];
+    currentPage = 1;
   }
 
   renderMovies();
@@ -728,13 +825,23 @@ elements.detailModal.addEventListener("click", handleBackdropClick);
 elements.closeDetailButton.addEventListener("click", closeDetail);
 elements.detailDeleteButton.addEventListener("click", handleDetailDelete);
 elements.detailEditButton.addEventListener("click", handleDetailEdit);
-elements.searchInput.addEventListener("input", renderMovies);
+elements.nextPageButton.addEventListener("click", () => changePage(currentPage + 1));
+elements.pageButtons.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-page]");
+  if (!button) {
+    return;
+  }
+
+  changePage(Number(button.dataset.page));
+});
+elements.prevPageButton.addEventListener("click", () => changePage(currentPage - 1));
+elements.searchInput.addEventListener("input", resetPageAndRender);
 elements.signOutButton.addEventListener("click", handleSignOut);
-elements.sortSelect.addEventListener("change", renderMovies);
+elements.sortSelect.addEventListener("change", resetPageAndRender);
 elements.clearSearchButton.addEventListener("click", () => {
   elements.searchInput.value = "";
   elements.searchInput.focus();
-  renderMovies();
+  resetPageAndRender();
 });
 document.addEventListener("keydown", handleKeydown);
 
