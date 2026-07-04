@@ -1,3 +1,13 @@
+const CANONICAL_HOST = "movie-notes-app-ecru.vercel.app";
+const isVercelPreviewHost =
+  location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
+
+if (isVercelPreviewHost) {
+  location.replace(
+    `https://${CANONICAL_HOST}${location.pathname}${location.search}${location.hash}`,
+  );
+}
+
 const STORAGE_KEY = "movie-notes.records.v1";
 
 const elements = {
