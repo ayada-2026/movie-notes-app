@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Notes</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Personal archive</p>
+          <h1>Movie Notes</h1>
+        </div>
+        <button class="primary-button" id="addMovieButton" type="button">
+          <span aria-hidden="true">+</span>
+          새 기록
+        </button>
+      </header>
+
+      <main>
+        <section class="toolbar" aria-label="검색 및 정렬">
+          <label class="search-field">
+            <span>제목 검색</span>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="영화 제목을 입력하세요"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="select-field">
+            <span>정렬</span>
+            <select id="sortSelect">
+              <option value="watchedDate-desc">본 날짜 최신순</option>
+              <option value="watchedDate-asc">본 날짜 오래된순</option>
+              <option value="releaseYear-desc">출시년도 높은순</option>
+              <option value="releaseYear-asc">출시년도 낮은순</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="summary-row" aria-live="polite">
+          <p id="resultSummary">0개의 기록</p>
+          <button class="ghost-button" id="clearSearchButton" type="button">
+            검색 초기화
+          </button>
+        </section>
+
+        <section class="movie-grid" id="movieGrid" aria-label="영화 감상 목록"></section>
+
+        <section class="empty-state is-hidden" id="emptyState">
+          <div class="empty-poster" aria-hidden="true">
+            <span></span>
+          </div>
+          <h2>아직 기록이 없습니다</h2>
+          <p>처음 남기고 싶은 영화 한 편을 추가해보세요.</p>
+          <button class="primary-button" id="emptyAddButton" type="button">
+            <span aria-hidden="true">+</span>
+            첫 기록 추가
+          </button>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop is-hidden" id="movieModal" role="presentation">
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Movie entry</p>
+            <h2 id="modalTitle">새 영화 기록</h2>
+          </div>
+          <button class="icon-button" id="closeModalButton" type="button" aria-label="닫기">
+            x
+          </button>
+        </div>
+
+        <form id="movieForm">
+          <input id="movieId" type="hidden" />
+
+          <label>
+            <span>제목</span>
+            <input id="titleInput" type="text" required maxlength="80" />
+          </label>
+
+          <div class="form-grid">
+            <label>
+              <span>출시년도</span>
+              <input
+                id="releaseYearInput"
+                type="number"
+                required
+                min="1888"
+                max="2100"
+                inputmode="numeric"
+              />
+            </label>
+
+            <label>
+              <span>본 날짜</span>
+              <input id="watchedDateInput" type="date" required />
+            </label>
+          </div>
+
+          <label>
+            <span>포스터 이미지 URL <small>선택</small></span>
+            <input
+              id="posterInput"
+              type="url"
+              placeholder="https://example.com/poster.jpg"
+            />
+          </label>
+
+          <label>
+            <span>감상</span>
+            <textarea
+              id="reviewInput"
+              required
+              rows="7"
+              maxlength="1000"
+              placeholder="영화를 보고 남기고 싶은 생각을 적어주세요."
+            ></textarea>
+          </label>
+
+          <p class="form-error" id="formError" aria-live="assertive"></p>
+
+          <div class="modal-actions">
+            <button class="secondary-button" id="cancelButton" type="button">취소</button>
+            <button class="primary-button" type="submit">저장</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
