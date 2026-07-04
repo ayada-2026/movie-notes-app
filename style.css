@@ -54,6 +54,35 @@ button {
   margin-bottom: 24px;
 }
 
+.top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.account-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 6px 0 14px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.account-chip span {
+  max-width: min(32vw, 260px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .eyebrow {
   margin: 0 0 7px;
   color: var(--accent-strong);
@@ -130,6 +159,39 @@ h1 {
   backdrop-filter: blur(14px);
 }
 
+.auth-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 420px);
+  gap: 24px;
+  align-items: center;
+  min-height: 430px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(217, 221, 216, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 14px 34px rgba(37, 43, 50, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.auth-copy h2 {
+  margin-bottom: 0;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.app-content {
+  display: block;
+}
+
 label {
   display: grid;
   gap: 8px;
@@ -176,6 +238,21 @@ textarea:focus {
   gap: 12px;
   min-height: 46px;
   margin-bottom: 16px;
+}
+
+.summary-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .summary-row p {
@@ -463,9 +540,36 @@ small {
     flex-direction: column;
   }
 
+  .top-actions,
+  .account-chip,
+  .summary-actions {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .top-actions,
+  .summary-actions {
+    flex-direction: column;
+  }
+
+  .account-chip {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .account-chip span {
+    max-width: 100%;
+  }
+
   .toolbar,
+  .auth-panel,
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .auth-panel {
+    min-height: auto;
+    padding: 18px;
   }
 
   .movie-grid {

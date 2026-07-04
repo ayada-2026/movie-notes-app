@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Movie Notes</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.min.js"></script>
   </head>
   <body>
     <div class="app-shell">
@@ -13,54 +14,90 @@
           <p class="eyebrow">Personal archive</p>
           <h1>Movie Notes</h1>
         </div>
-        <button class="primary-button" id="addMovieButton" type="button">
-          <span aria-hidden="true">+</span>
-          새 기록
-        </button>
+        <div class="top-actions">
+          <div class="account-chip is-hidden" id="accountChip">
+            <span id="accountEmail"></span>
+            <button class="ghost-button" id="signOutButton" type="button">로그아웃</button>
+          </div>
+          <button class="primary-button is-hidden" id="addMovieButton" type="button">
+            <span aria-hidden="true">+</span>
+            새 기록
+          </button>
+        </div>
       </header>
 
       <main>
-        <section class="toolbar" aria-label="검색 및 정렬">
-          <label class="search-field">
-            <span>제목 검색</span>
-            <input
-              id="searchInput"
-              type="search"
-              placeholder="영화 제목을 입력하세요"
-              autocomplete="off"
-            />
-          </label>
-
-          <label class="select-field">
-            <span>정렬</span>
-            <select id="sortSelect">
-              <option value="watchedDate-desc">본 날짜 최신순</option>
-              <option value="watchedDate-asc">본 날짜 오래된순</option>
-              <option value="releaseYear-desc">출시년도 높은순</option>
-              <option value="releaseYear-asc">출시년도 낮은순</option>
-            </select>
-          </label>
-        </section>
-
-        <section class="summary-row" aria-live="polite">
-          <p id="resultSummary">0개의 기록</p>
-          <button class="ghost-button" id="clearSearchButton" type="button">
-            검색 초기화
-          </button>
-        </section>
-
-        <section class="movie-grid" id="movieGrid" aria-label="영화 감상 목록"></section>
-
-        <section class="empty-state is-hidden" id="emptyState">
-          <div class="empty-poster" aria-hidden="true">
-            <span></span>
+        <section class="auth-panel" id="authView">
+          <div class="auth-copy">
+            <p class="eyebrow">Private notes</p>
+            <h2>로그인</h2>
           </div>
-          <h2>아직 기록이 없습니다</h2>
-          <p>처음 남기고 싶은 영화 한 편을 추가해보세요.</p>
-          <button class="primary-button" id="emptyAddButton" type="button">
-            <span aria-hidden="true">+</span>
-            첫 기록 추가
-          </button>
+          <form class="auth-form" id="authForm">
+            <label>
+              <span>이메일</span>
+              <input id="emailInput" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span>비밀번호</span>
+              <input
+                id="passwordInput"
+                type="password"
+                autocomplete="current-password"
+                required
+                minlength="6"
+              />
+            </label>
+            <p class="form-error" id="authError" aria-live="assertive"></p>
+            <button class="primary-button" id="signInButton" type="submit">로그인</button>
+          </form>
+        </section>
+
+        <section class="app-content is-hidden" id="appContent">
+          <section class="toolbar" aria-label="검색 및 정렬">
+            <label class="search-field">
+              <span>제목 검색</span>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="영화 제목을 입력하세요"
+                autocomplete="off"
+              />
+            </label>
+
+            <label class="select-field">
+              <span>정렬</span>
+              <select id="sortSelect">
+                <option value="watchedDate-desc">본 날짜 최신순</option>
+                <option value="watchedDate-asc">본 날짜 오래된순</option>
+                <option value="releaseYear-desc">출시년도 높은순</option>
+                <option value="releaseYear-asc">출시년도 낮은순</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="summary-row" aria-live="polite">
+            <p id="resultSummary">0개의 기록</p>
+            <div class="summary-actions">
+              <p class="status-text" id="appStatus"></p>
+              <button class="ghost-button" id="clearSearchButton" type="button">
+                검색 초기화
+              </button>
+            </div>
+          </section>
+
+          <section class="movie-grid" id="movieGrid" aria-label="영화 감상 목록"></section>
+
+          <section class="empty-state is-hidden" id="emptyState">
+            <div class="empty-poster" aria-hidden="true">
+              <span></span>
+            </div>
+            <h2>아직 기록이 없습니다</h2>
+            <p>처음 남기고 싶은 영화 한 편을 추가해보세요.</p>
+            <button class="primary-button" id="emptyAddButton" type="button">
+              <span aria-hidden="true">+</span>
+              첫 기록 추가
+            </button>
+          </section>
         </section>
       </main>
     </div>

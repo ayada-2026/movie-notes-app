@@ -1,112 +1,62 @@
 const CANONICAL_HOST = "movie-notes-app-ecru.vercel.app";
-const STORAGE_KEY = "movie-notes.records.v1";
-const IMPORT_HASH_KEY = "movieNotesImport";
+const SUPABASE_URL = "https://zjolzipsoqsczilhgqwq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KYwwO9ZHOAg4T45dzCAXsg_fJbShoXd";
+
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
 
 if (isVercelPreviewHost) {
   const targetUrl = new URL(location.href);
-  const storedMovies = localStorage.getItem(STORAGE_KEY);
-
   targetUrl.protocol = "https:";
   targetUrl.hostname = CANONICAL_HOST;
-
-  if (storedMovies && storedMovies !== "[]") {
-    targetUrl.hash = `${IMPORT_HASH_KEY}=${encodeURIComponent(storedMovies)}`;
-  }
-
   location.replace(targetUrl.toString());
 }
 
-importMoviesFromHash();
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    db: { schema: "public" },
+  },
+);
 
 const elements = {
+  accountChip: document.querySelector("#accountChip"),
+  accountEmail: document.querySelector("#accountEmail"),
   addMovieButton: document.querySelector("#addMovieButton"),
-  emptyAddButton: document.querySelector("#emptyAddButton"),
+  appContent: document.querySelector("#appContent"),
+  appStatus: document.querySelector("#appStatus"),
+  authError: document.querySelector("#authError"),
+  authForm: document.querySelector("#authForm"),
+  authView: document.querySelector("#authView"),
+  cancelButton: document.querySelector("#cancelButton"),
   clearSearchButton: document.querySelector("#clearSearchButton"),
   closeModalButton: document.querySelector("#closeModalButton"),
-  cancelButton: document.querySelector("#cancelButton"),
-  modal: document.querySelector("#movieModal"),
-  modalTitle: document.querySelector("#modalTitle"),
+  emailInput: document.querySelector("#emailInput"),
+  emptyAddButton: document.querySelector("#emptyAddButton"),
+  emptyState: document.querySelector("#emptyState"),
   form: document.querySelector("#movieForm"),
   formError: document.querySelector("#formError"),
+  modal: document.querySelector("#movieModal"),
+  modalTitle: document.querySelector("#modalTitle"),
   movieGrid: document.querySelector("#movieGrid"),
-  emptyState: document.querySelector("#emptyState"),
-  resultSummary: document.querySelector("#resultSummary"),
-  searchInput: document.querySelector("#searchInput"),
-  sortSelect: document.querySelector("#sortSelect"),
   movieId: document.querySelector("#movieId"),
-  titleInput: document.querySelector("#titleInput"),
-  releaseYearInput: document.querySelector("#releaseYearInput"),
-  watchedDateInput: document.querySelector("#watchedDateInput"),
+  passwordInput: document.querySelector("#passwordInput"),
   posterInput: document.querySelector("#posterInput"),
+  releaseYearInput: document.querySelector("#releaseYearInput"),
+  resultSummary: document.querySelector("#resultSummary"),
   reviewInput: document.querySelector("#reviewInput"),
+  searchInput: document.querySelector("#searchInput"),
+  signInButton: document.querySelector("#signInButton"),
+  signOutButton: document.querySelector("#signOutButton"),
+  sortSelect: document.querySelector("#sortSelect"),
+  titleInput: document.querySelector("#titleInput"),
+  watchedDateInput: document.querySelector("#watchedDateInput"),
 };
 
-let movies = loadMovies();
-
-function loadMovies() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) {
-      return [];
-    }
-
-    const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function importMoviesFromHash() {
-  const hashParams = new URLSearchParams(location.hash.slice(1));
-  const importedMovies = hashParams.get(IMPORT_HASH_KEY);
-
-  if (!importedMovies) {
-    return;
-  }
-
-  try {
-    const incomingMovies = JSON.parse(importedMovies);
-    const savedMovies = loadMovies();
-
-    if (!Array.isArray(incomingMovies)) {
-      return;
-    }
-
-    const mergedMovies = new Map();
-
-    [...savedMovies, ...incomingMovies].forEach((movie) => {
-      if (!movie || !movie.id) {
-        return;
-      }
-
-      const existingMovie = mergedMovies.get(movie.id);
-      if (!existingMovie || movie.updatedAt > existingMovie.updatedAt) {
-        mergedMovies.set(movie.id, movie);
-      }
-    });
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...mergedMovies.values()]));
-  } catch {
-    return;
-  } finally {
-    history.replaceState(null, "", `${location.pathname}${location.search}`);
-  }
-}
-
-function saveMovies() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
-}
-
-function createMovieId() {
-  if (window.crypto && typeof window.crypto.randomUUID === "function") {
-    return window.crypto.randomUUID();
-  }
-
-  return `movie_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-}
+let movies = [];
+let session = null;
+let isSaving = false;
 
 function normalizeText(value) {
   return value.trim().replace(/\s+/g, " ");
@@ -138,12 +88,69 @@ function formatDate(value) {
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function mapMovieFromDb(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    releaseYear: row.release_year,
+    watchedDate: row.watched_date,
+    review: row.review,
+    poster: row.poster || "",
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function movieToDbPayload() {
+  return {
+    title: normalizeText(elements.titleInput.value),
+    release_year: Number(elements.releaseYearInput.value),
+    watched_date: elements.watchedDateInput.value,
+    review: elements.reviewInput.value.trim(),
+    poster: elements.posterInput.value.trim() || null,
+  };
+}
+
+function setStatus(message = "") {
+  elements.appStatus.textContent = message;
+}
+
+function setAuthError(message = "") {
+  elements.authError.textContent = message;
+}
+
+function setFormError(message = "") {
+  elements.formError.textContent = message;
+}
+
+function setSavingState(nextIsSaving) {
+  isSaving = nextIsSaving;
+  elements.form.querySelector('button[type="submit"]').disabled = isSaving;
+}
+
+function renderAuthState() {
+  const isSignedIn = Boolean(session?.user);
+
+  elements.authView.classList.toggle("is-hidden", isSignedIn);
+  elements.appContent.classList.toggle("is-hidden", !isSignedIn);
+  elements.addMovieButton.classList.toggle("is-hidden", !isSignedIn);
+  elements.accountChip.classList.toggle("is-hidden", !isSignedIn);
+  elements.accountEmail.textContent = session?.user?.email || "";
+
+  if (!isSignedIn) {
+    movies = [];
+    renderMovies();
+    closeModal();
+    setStatus("");
+  }
 }
 
 function renderMovies() {
@@ -200,9 +207,32 @@ function renderMovieCard(movie) {
   `;
 }
 
+async function loadMoviesFromDb() {
+  if (!session?.user) {
+    return;
+  }
+
+  setStatus("불러오는 중");
+
+  const { data, error } = await supabaseClient
+    .from("movie_notes")
+    .select("id,title,release_year,watched_date,review,poster,created_at,updated_at")
+    .order("watched_date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    setStatus("목록을 불러오지 못했습니다");
+    return;
+  }
+
+  movies = data.map(mapMovieFromDb);
+  renderMovies();
+  setStatus("");
+}
+
 function openModal(movie = null) {
   elements.form.reset();
-  elements.formError.textContent = "";
+  setFormError("");
 
   if (movie) {
     elements.modalTitle.textContent = "영화 기록 수정";
@@ -224,6 +254,7 @@ function openModal(movie = null) {
 
 function closeModal() {
   elements.modal.classList.add("is-hidden");
+  setSavingState(false);
 }
 
 function validateForm() {
@@ -243,45 +274,83 @@ function validateForm() {
   return "";
 }
 
-function handleSubmit(event) {
+async function handleAuthSubmit(event) {
+  event.preventDefault();
+  setAuthError("");
+  elements.signInButton.disabled = true;
+
+  const email = elements.emailInput.value.trim();
+  const password = elements.passwordInput.value;
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+  elements.signInButton.disabled = false;
+
+  if (error) {
+    setAuthError("이메일 또는 비밀번호를 확인해주세요.");
+  }
+}
+
+async function handleSignOut() {
+  setStatus("로그아웃 중");
+  await supabaseClient.auth.signOut();
+}
+
+async function handleSubmit(event) {
   event.preventDefault();
 
-  const errorMessage = validateForm();
-  if (errorMessage) {
-    elements.formError.textContent = errorMessage;
+  if (!session?.user || isSaving) {
     return;
   }
 
-  const now = new Date().toISOString();
-  const id = elements.movieId.value || createMovieId();
-  const existingMovie = movies.find((movie) => movie.id === id);
-  const nextMovie = {
-    id,
-    title: normalizeText(elements.titleInput.value),
-    releaseYear: Number(elements.releaseYearInput.value),
-    watchedDate: elements.watchedDateInput.value,
-    review: elements.reviewInput.value.trim(),
-    poster: elements.posterInput.value.trim(),
-    createdAt: existingMovie?.createdAt || now,
-    updatedAt: now,
-  };
+  const errorMessage = validateForm();
+  if (errorMessage) {
+    setFormError(errorMessage);
+    return;
+  }
 
-  if (existingMovie) {
+  setSavingState(true);
+  setFormError("");
+
+  const id = elements.movieId.value;
+  const payload = movieToDbPayload();
+  const query = id
+    ? supabaseClient
+        .from("movie_notes")
+        .update(payload)
+        .eq("id", id)
+        .select("id,title,release_year,watched_date,review,poster,created_at,updated_at")
+        .single()
+    : supabaseClient
+        .from("movie_notes")
+        .insert(payload)
+        .select("id,title,release_year,watched_date,review,poster,created_at,updated_at")
+        .single();
+
+  const { data, error } = await query;
+  setSavingState(false);
+
+  if (error) {
+    setFormError("저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
+    return;
+  }
+
+  const nextMovie = mapMovieFromDb(data);
+
+  if (id) {
     movies = movies.map((movie) => (movie.id === id ? nextMovie : movie));
   } else {
     movies = [nextMovie, ...movies];
   }
 
-  saveMovies();
   renderMovies();
   closeModal();
 }
 
-function handleGridClick(event) {
+async function handleGridClick(event) {
   const button = event.target.closest("button[data-action]");
   const card = event.target.closest(".movie-card");
 
-  if (!button || !card) {
+  if (!button || !card || !session?.user) {
     return;
   }
 
@@ -300,9 +369,16 @@ function handleGridClick(event) {
     return;
   }
 
+  const { error } = await supabaseClient.from("movie_notes").delete().eq("id", movie.id);
+
+  if (error) {
+    setStatus("삭제하지 못했습니다");
+    return;
+  }
+
   movies = movies.filter((item) => item.id !== movie.id);
-  saveMovies();
   renderMovies();
+  setStatus("");
 }
 
 function handleBackdropClick(event) {
@@ -317,7 +393,40 @@ function handleKeydown(event) {
   }
 }
 
+async function initializeApp() {
+  renderMovies();
+  setStatus("세션 확인 중");
+
+  const {
+    data: { session: currentSession },
+    error,
+  } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    setAuthError("로그인 상태를 확인하지 못했습니다.");
+    setStatus("");
+    return;
+  }
+
+  session = currentSession;
+  renderAuthState();
+
+  if (session?.user) {
+    await loadMoviesFromDb();
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (_event, nextSession) => {
+    session = nextSession;
+    renderAuthState();
+
+    if (session?.user) {
+      await loadMoviesFromDb();
+    }
+  });
+}
+
 elements.addMovieButton.addEventListener("click", () => openModal());
+elements.authForm.addEventListener("submit", handleAuthSubmit);
 elements.emptyAddButton.addEventListener("click", () => openModal());
 elements.closeModalButton.addEventListener("click", closeModal);
 elements.cancelButton.addEventListener("click", closeModal);
@@ -325,6 +434,7 @@ elements.form.addEventListener("submit", handleSubmit);
 elements.movieGrid.addEventListener("click", handleGridClick);
 elements.modal.addEventListener("click", handleBackdropClick);
 elements.searchInput.addEventListener("input", renderMovies);
+elements.signOutButton.addEventListener("click", handleSignOut);
 elements.sortSelect.addEventListener("change", renderMovies);
 elements.clearSearchButton.addEventListener("click", () => {
   elements.searchInput.value = "";
@@ -333,4 +443,4 @@ elements.clearSearchButton.addEventListener("click", () => {
 });
 document.addEventListener("keydown", handleKeydown);
 
-renderMovies();
+initializeApp();
