@@ -1,14 +1,24 @@
 const CANONICAL_HOST = "movie-notes-app-ecru.vercel.app";
+const STORAGE_KEY = "movie-notes.records.v1";
+const IMPORT_HASH_KEY = "movieNotesImport";
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
 
 if (isVercelPreviewHost) {
-  location.replace(
-    `https://${CANONICAL_HOST}${location.pathname}${location.search}${location.hash}`,
-  );
+  const targetUrl = new URL(location.href);
+  const storedMovies = localStorage.getItem(STORAGE_KEY);
+
+  targetUrl.protocol = "https:";
+  targetUrl.hostname = CANONICAL_HOST;
+
+  if (storedMovies && storedMovies !== "[]") {
+    targetUrl.hash = `${IMPORT_HASH_KEY}=${encodeURIComponent(storedMovies)}`;
+  }
+
+  location.replace(targetUrl.toString());
 }
 
-const STORAGE_KEY = "movie-notes.records.v1";
+importMoviesFromHash();
 
 const elements = {
   addMovieButton: document.querySelector("#addMovieButton"),
@@ -46,6 +56,43 @@ function loadMovies() {
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
+  }
+}
+
+function importMoviesFromHash() {
+  const hashParams = new URLSearchParams(location.hash.slice(1));
+  const importedMovies = hashParams.get(IMPORT_HASH_KEY);
+
+  if (!importedMovies) {
+    return;
+  }
+
+  try {
+    const incomingMovies = JSON.parse(importedMovies);
+    const savedMovies = loadMovies();
+
+    if (!Array.isArray(incomingMovies)) {
+      return;
+    }
+
+    const mergedMovies = new Map();
+
+    [...savedMovies, ...incomingMovies].forEach((movie) => {
+      if (!movie || !movie.id) {
+        return;
+      }
+
+      const existingMovie = mergedMovies.get(movie.id);
+      if (!existingMovie || movie.updatedAt > existingMovie.updatedAt) {
+        mergedMovies.set(movie.id, movie);
+      }
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...mergedMovies.values()]));
+  } catch {
+    return;
+  } finally {
+    history.replaceState(null, "", `${location.pathname}${location.search}`);
   }
 }
 
