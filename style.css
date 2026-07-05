@@ -1,15 +1,18 @@
 :root {
   color-scheme: light;
-  --bg: #f5f4ef;
-  --panel: #ffffff;
-  --ink: #1d2430;
-  --muted: #697281;
-  --line: #d9ddd8;
-  --accent: #2f6f73;
-  --accent-strong: #194f54;
-  --accent-soft: #dcebed;
-  --warn: #b94b3d;
-  --shadow: 0 18px 45px rgba(37, 43, 50, 0.12);
+  --bg: #f6efe2;
+  --paper: #fffaf0;
+  --panel: #fffdf7;
+  --ink: #1f2834;
+  --muted: #6f746f;
+  --line: #decfb8;
+  --accent: #174f49;
+  --accent-strong: #103d39;
+  --accent-soft: #dce8df;
+  --navy: #233340;
+  --sepia: #826442;
+  --warn: #b44738;
+  --shadow: 0 18px 45px rgba(58, 45, 29, 0.12);
 }
 
 * {
@@ -20,9 +23,12 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(135deg, rgba(47, 111, 115, 0.08), transparent 32rem),
-    linear-gradient(315deg, rgba(146, 89, 63, 0.07), transparent 28rem),
+    linear-gradient(90deg, rgba(31, 40, 52, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(130, 100, 66, 0.08), transparent 360px),
     var(--bg);
+  background-size:
+    38px 38px,
+    auto;
   color: var(--ink);
   font-family:
     Inter, Pretendard, "Segoe UI", "Noto Sans KR", system-ui, -apple-system,
@@ -40,18 +46,62 @@ button {
   cursor: pointer;
 }
 
+.film-rail {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  width: 28px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 250, 240, 0.58) 0 12px,
+      transparent 12px 25px
+    ),
+    #263233;
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.22);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
 .app-shell {
+  position: relative;
+  z-index: 1;
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 36px 0 56px;
+  padding: 30px 0 56px;
 }
 
 .topbar {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 24px;
+  gap: 24px;
+  min-height: 132px;
+  margin-bottom: 20px;
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  bottom: 0;
+  width: min(320px, 38vw);
+  height: 82px;
+  background:
+    radial-gradient(circle at 34px 30px, transparent 0 13px, rgba(23, 79, 73, 0.1) 14px 18px, transparent 19px),
+    radial-gradient(circle at 68px 30px, transparent 0 13px, rgba(23, 79, 73, 0.1) 14px 18px, transparent 19px),
+    linear-gradient(90deg, rgba(35, 51, 64, 0.08), transparent);
+  border-radius: 8px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.brand-block {
+  position: relative;
+  z-index: 1;
 }
 
 .top-actions {
@@ -66,14 +116,15 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
-  padding: 0 6px 0 14px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid var(--line);
+  min-height: 48px;
+  padding: 0 8px 0 16px;
+  background: rgba(255, 253, 247, 0.82);
+  border: 1px solid rgba(130, 100, 66, 0.24);
   border-radius: 8px;
-  color: var(--muted);
+  color: #615846;
   font-size: 0.88rem;
   font-weight: 800;
+  box-shadow: 0 10px 22px rgba(58, 45, 29, 0.08);
 }
 
 .account-chip span {
@@ -85,7 +136,7 @@ button {
 
 .eyebrow {
   margin: 0 0 7px;
-  color: var(--accent-strong);
+  color: var(--sepia);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -99,10 +150,33 @@ p {
 }
 
 h1 {
-  margin-bottom: 0;
-  font-size: clamp(2rem, 4vw, 3.4rem);
-  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--accent-strong);
+  font-family: Georgia, "Times New Roman", "Noto Serif KR", serif;
+  font-size: clamp(2.9rem, 7vw, 5.4rem);
+  font-weight: 700;
+  line-height: 0.9;
   letter-spacing: 0;
+}
+
+.brand-note {
+  display: inline-block;
+  margin: 0;
+  color: #6f5635;
+  font-family: "Segoe Print", "Noto Serif KR", serif;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.4;
+}
+
+.brand-note::after {
+  content: "";
+  display: inline-block;
+  width: 96px;
+  height: 1px;
+  margin-left: 10px;
+  vertical-align: middle;
+  background: rgba(111, 86, 53, 0.65);
+  transform: rotate(-4deg);
 }
 
 .primary-button,
@@ -123,11 +197,11 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 18px;
+  padding: 0 20px;
   background: var(--accent);
   color: #fff;
   font-weight: 800;
-  box-shadow: 0 12px 28px rgba(47, 111, 115, 0.24);
+  box-shadow: 0 14px 28px rgba(23, 79, 73, 0.26);
 }
 
 .primary-button span {
@@ -151,11 +225,12 @@ h1 {
   grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
   gap: 14px;
   align-items: end;
-  padding: 18px;
-  margin-bottom: 14px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(217, 221, 216, 0.9);
+  padding: 20px;
+  margin-bottom: 18px;
+  background: rgba(255, 253, 247, 0.9);
+  border: 1px solid rgba(130, 100, 66, 0.22);
   border-radius: 8px;
+  box-shadow: 0 14px 30px rgba(58, 45, 29, 0.08);
   backdrop-filter: blur(14px);
 }
 
@@ -166,8 +241,8 @@ h1 {
   align-items: center;
   min-height: 430px;
   padding: 30px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(217, 221, 216, 0.9);
+  background: rgba(255, 253, 247, 0.86);
+  border: 1px solid rgba(130, 100, 66, 0.22);
   border-radius: 8px;
   box-shadow: 0 14px 34px rgba(37, 43, 50, 0.08);
   backdrop-filter: blur(14px);
@@ -206,7 +281,7 @@ textarea {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: rgba(255, 253, 247, 0.96);
   color: var(--ink);
   outline: 0;
 }
@@ -215,6 +290,20 @@ input,
 select {
   height: 46px;
   padding: 0 13px;
+}
+
+#searchInput {
+  padding-left: 42px;
+  background-image:
+    radial-gradient(circle, transparent 0 7px, #7c6645 8px 9px, transparent 10px),
+    linear-gradient(45deg, transparent 0 29px, #7c6645 30px 32px, transparent 33px);
+  background-position:
+    15px 50%,
+    15px 50%;
+  background-repeat: no-repeat;
+  background-size:
+    24px 24px,
+    24px 24px;
 }
 
 textarea {
@@ -238,6 +327,26 @@ textarea:focus {
   gap: 12px;
   min-height: 46px;
   margin-bottom: 16px;
+}
+
+#resultSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+#resultSummary::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, rgba(255, 250, 240, 0.52) 0 4px, transparent 4px 8px),
+    linear-gradient(135deg, #2f3738, #4d4434);
+  box-shadow:
+    inset 0 7px 0 rgba(255, 250, 240, 0.18),
+    inset 0 -7px 0 rgba(0, 0, 0, 0.14);
 }
 
 .summary-actions {
@@ -276,27 +385,33 @@ textarea:focus {
 
 .movie-grid {
   display: grid;
-  gap: 10px;
+  gap: 9px;
 }
 
 .movie-card {
   overflow: hidden;
   display: grid;
-  grid-template-columns: 82px minmax(0, 1fr);
-  gap: 14px;
-  min-height: 124px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(217, 221, 216, 0.9);
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 126px;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.56), transparent),
+    var(--paper);
+  border: 1px solid rgba(130, 100, 66, 0.22);
   border-radius: 8px;
-  box-shadow: 0 10px 24px rgba(37, 43, 50, 0.07);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset,
+    0 9px 22px rgba(58, 45, 29, 0.08);
   cursor: pointer;
 }
 
 .movie-card:hover,
 .movie-card:focus-visible {
-  border-color: rgba(47, 111, 115, 0.5);
-  box-shadow: 0 14px 30px rgba(37, 43, 50, 0.1);
+  border-color: rgba(23, 79, 73, 0.38);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.78) inset,
+    0 14px 28px rgba(58, 45, 29, 0.11);
   outline: 0;
 }
 
@@ -304,9 +419,10 @@ textarea:focus {
   position: relative;
   overflow: hidden;
   width: 100%;
-  min-height: 104px;
+  min-height: 102px;
   background: #27313b;
   border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255, 250, 240, 0.18);
 }
 
 .poster-frame img {
@@ -321,9 +437,14 @@ textarea:focus {
   inset: 0;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 18px;
   background:
-    linear-gradient(145deg, #26343d 0%, #3c5759 48%, #7f6652 100%);
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 250, 240, 0.18) 0 5px,
+      transparent 5px 13px
+    ),
+    linear-gradient(145deg, #253636 0%, #344c51 48%, #6e5b42 100%);
   color: #f8f4ea;
   text-align: center;
 }
@@ -332,14 +453,18 @@ textarea:focus {
 .empty-poster::before {
   content: "";
   position: absolute;
-  inset: 24px;
+  inset: 13px;
   border: 2px solid rgba(255, 255, 255, 0.42);
   border-radius: 8px;
 }
 
-.movie-card .poster-placeholder::before,
-.detail-poster-frame .poster-placeholder::before {
-  inset: 12px;
+.poster-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-left: 8px solid rgba(14, 21, 23, 0.28);
+  border-right: 8px solid rgba(14, 21, 23, 0.28);
+  pointer-events: none;
 }
 
 .poster-placeholder span,
@@ -347,21 +472,22 @@ textarea:focus {
   position: relative;
   display: grid;
   place-items: center;
-  width: 88px;
+  width: 48px;
   aspect-ratio: 1;
   border: 2px solid rgba(255, 255, 255, 0.55);
   border-radius: 50%;
+  background: rgba(12, 18, 20, 0.12);
 }
 
 .movie-card .poster-placeholder span {
-  width: 38px;
+  width: 46px;
 }
 
 .movie-card .poster-placeholder span::before {
-  margin-left: 4px;
-  border-top-width: 9px;
-  border-bottom-width: 9px;
-  border-left-width: 14px;
+  margin-left: 5px;
+  border-top-width: 10px;
+  border-bottom-width: 10px;
+  border-left-width: 16px;
 }
 
 .poster-placeholder span::before,
@@ -378,7 +504,7 @@ textarea:focus {
 .card-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
+  gap: 18px;
   align-items: center;
   min-width: 0;
 }
@@ -391,7 +517,9 @@ textarea:focus {
 
 .card-title {
   margin: 0;
-  font-size: 1.05rem;
+  color: #17212c;
+  font-size: 1.2rem;
+  font-weight: 900;
   line-height: 1.25;
   letter-spacing: 0;
   overflow-wrap: anywhere;
@@ -401,7 +529,7 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  color: var(--muted);
+  color: #766b58;
   font-size: 0.88rem;
   font-weight: 800;
 }
@@ -411,15 +539,15 @@ textarea:focus {
   align-items: center;
   min-height: 28px;
   padding: 0 9px;
-  background: var(--accent-soft);
-  color: var(--accent-strong);
+  background: var(--accent);
+  color: #fffaf0;
   border-radius: 999px;
 }
 
 .review-preview {
   margin: 0;
-  color: #4e5865;
-  line-height: 1.45;
+  color: #404957;
+  line-height: 1.52;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
@@ -430,6 +558,13 @@ textarea:focus {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  opacity: 0.72;
+  transition: opacity 150ms ease;
+}
+
+.movie-card:hover .card-actions,
+.movie-card:focus-within .card-actions {
+  opacity: 1;
 }
 
 .muted-inline {
@@ -438,13 +573,31 @@ textarea:focus {
 
 .secondary-button {
   padding: 0 13px;
-  background: #eef1ee;
+  background: #eee9df;
   color: var(--ink);
   font-weight: 800;
 }
 
+.secondary-button:disabled {
+  color: #aaa195;
+  cursor: default;
+  opacity: 0.58;
+  transform: none;
+}
+
 .danger-button {
-  background: #fae6e2;
+  background: #f7e5df;
+  color: var(--warn);
+}
+
+.card-actions .secondary-button {
+  min-height: 38px;
+  background: transparent;
+  color: #6f5635;
+  box-shadow: none;
+}
+
+.card-actions .danger-button {
   color: var(--warn);
 }
 
@@ -471,13 +624,13 @@ textarea:focus {
   padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 253, 247, 0.9);
   color: var(--ink);
   font-weight: 900;
 }
 
 .page-button:hover {
-  border-color: rgba(47, 111, 115, 0.5);
+  border-color: rgba(23, 79, 73, 0.5);
 }
 
 .page-button.is-active {
@@ -500,9 +653,9 @@ textarea:focus {
   align-content: center;
   gap: 12px;
   padding: 36px;
-  border: 1px dashed #c5cbc4;
+  border: 1px dashed rgba(130, 100, 66, 0.32);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 253, 247, 0.6);
   text-align: center;
 }
 
@@ -523,7 +676,12 @@ textarea:focus {
   aspect-ratio: 0.72;
   border-radius: 8px;
   background:
-    linear-gradient(145deg, #26343d 0%, #3c5759 48%, #7f6652 100%);
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 250, 240, 0.16) 0 5px,
+      transparent 5px 13px
+    ),
+    linear-gradient(145deg, #253636 0%, #344c51 48%, #6e5b42 100%);
   color: #f8f4ea;
 }
 
@@ -551,7 +709,10 @@ textarea:focus {
 }
 
 .detail-modal {
-  width: min(860px, 100%);
+  width: min(900px, 100%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent),
+    var(--paper);
 }
 
 .modal-header {
@@ -563,20 +724,22 @@ textarea:focus {
   align-items: start;
   gap: 16px;
   padding: 22px 22px 14px;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 253, 247, 0.94);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(10px);
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.35rem;
+  color: var(--navy);
+  font-size: 1.45rem;
+  line-height: 1.25;
 }
 
 .icon-button {
   width: 42px;
   min-height: 42px;
-  background: #eef1ee;
+  background: #eee9df;
   color: var(--ink);
   font-weight: 900;
 }
@@ -646,13 +809,15 @@ small {
 
 .detail-body {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
-  gap: 22px;
-  padding: 22px;
+  grid-template-columns: minmax(190px, 250px) minmax(0, 1fr);
+  gap: 26px;
+  padding: 24px;
 }
 
 .detail-poster-frame {
-  min-height: 360px;
+  min-height: 340px;
+  border: 1px solid rgba(130, 100, 66, 0.22);
+  box-shadow: 0 12px 26px rgba(58, 45, 29, 0.12);
 }
 
 .detail-content {
@@ -668,11 +833,13 @@ small {
 
 .detail-review {
   margin: 0;
-  color: #3f4a58;
-  font-size: 1rem;
-  line-height: 1.78;
+  color: #303948;
+  font-size: 1.02rem;
+  line-height: 1.86;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  padding-top: 14px;
+  border-top: 1px solid rgba(130, 100, 66, 0.2);
 }
 
 .detail-actions {
@@ -684,15 +851,36 @@ small {
 }
 
 @media (max-width: 720px) {
+  .film-rail {
+    width: 10px;
+    opacity: 0.35;
+  }
+
   .app-shell {
     width: min(100% - 24px, 1180px);
     padding-top: 24px;
+  }
+
+  .topbar::after {
+    display: none;
+  }
+
+  h1 {
+    font-size: clamp(2.7rem, 14vw, 4rem);
+  }
+
+  .brand-note::after {
+    width: 56px;
   }
 
   .topbar,
   .summary-row {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .topbar {
+    min-height: auto;
   }
 
   .top-actions,
@@ -728,13 +916,13 @@ small {
   }
 
   .movie-card {
-    grid-template-columns: 70px minmax(0, 1fr);
+    grid-template-columns: 84px minmax(0, 1fr);
     gap: 12px;
     min-height: 118px;
   }
 
   .poster-frame {
-    min-height: 96px;
+    min-height: 88px;
   }
 
   .card-body {

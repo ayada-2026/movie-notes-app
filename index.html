@@ -3,16 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Movie Notes</title>
+    <title>Cinema Note</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.min.js"></script>
   </head>
   <body>
+    <div class="film-rail" aria-hidden="true"></div>
     <div class="app-shell">
       <header class="topbar">
-        <div>
+        <div class="brand-block">
           <p class="eyebrow">Personal archive</p>
-          <h1>Movie Notes</h1>
+          <h1>Cinema Note</h1>
+          <p class="brand-note">기억하고 싶은 영화, 한 줄의 기록</p>
         </div>
         <div class="top-actions">
           <div class="account-chip is-hidden" id="accountChip">
