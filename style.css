@@ -852,13 +852,14 @@ small {
 
 @media (max-width: 720px) {
   .film-rail {
-    width: 10px;
-    opacity: 0.35;
+    width: 4px;
+    background: #263233;
+    opacity: 0.18;
   }
 
   .app-shell {
-    width: min(100% - 24px, 1180px);
-    padding-top: 24px;
+    width: min(100% - 28px, 1180px);
+    padding-top: 20px;
   }
 
   .topbar::after {
@@ -866,38 +867,43 @@ small {
   }
 
   h1 {
-    font-size: clamp(2.7rem, 14vw, 4rem);
+    font-size: clamp(2.55rem, 12vw, 3.35rem);
+  }
+
+  .brand-note {
+    font-size: 0.98rem;
   }
 
   .brand-note::after {
-    width: 56px;
+    width: 42px;
   }
 
-  .topbar,
-  .summary-row {
+  .topbar {
     align-items: stretch;
     flex-direction: column;
   }
 
   .topbar {
     min-height: auto;
+    gap: 16px;
+    margin-bottom: 18px;
   }
 
   .top-actions,
-  .account-chip,
-  .summary-actions {
+  .account-chip {
     align-items: stretch;
     justify-content: stretch;
   }
 
-  .top-actions,
-  .summary-actions {
+  .top-actions {
     flex-direction: column;
+    gap: 8px;
   }
 
   .account-chip {
     width: 100%;
     justify-content: space-between;
+    min-height: 44px;
   }
 
   .account-chip span {
@@ -910,24 +916,93 @@ small {
     grid-template-columns: 1fr;
   }
 
+  .toolbar {
+    gap: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
   .auth-panel {
     min-height: auto;
     padding: 18px;
   }
 
+  .summary-row {
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 12px;
+  }
+
+  .summary-actions {
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  #resultSummary {
+    gap: 8px;
+    font-size: 0.98rem;
+  }
+
+  #resultSummary::before {
+    width: 18px;
+    height: 18px;
+  }
+
+  #clearSearchButton {
+    min-height: 36px;
+    padding: 0 6px;
+    white-space: nowrap;
+  }
+
   .movie-card {
-    grid-template-columns: 84px minmax(0, 1fr);
+    grid-template-columns: 76px minmax(0, 1fr);
     gap: 12px;
-    min-height: 118px;
+    min-height: 112px;
+    padding: 10px;
   }
 
   .poster-frame {
-    min-height: 88px;
+    min-height: 96px;
+  }
+
+  .poster-placeholder {
+    padding: 12px;
+  }
+
+  .poster-placeholder::before {
+    inset: 10px;
+  }
+
+  .poster-placeholder::after {
+    inset: 7px;
+    border-left-width: 6px;
+    border-right-width: 6px;
+  }
+
+  .movie-card .poster-placeholder span {
+    width: 38px;
+  }
+
+  .card-title {
+    font-size: 1.04rem;
+  }
+
+  .card-meta {
+    font-size: 0.82rem;
+  }
+
+  .meta-pill {
+    min-height: 26px;
+  }
+
+  .review-preview {
+    font-size: 0.94rem;
   }
 
   .card-body {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
     align-items: start;
   }
 
@@ -935,13 +1010,26 @@ small {
     justify-content: flex-start;
   }
 
+  .card-actions .secondary-button {
+    min-height: 34px;
+    padding: 0 8px;
+  }
+
   .pagination {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
   }
 
   .page-buttons {
+    width: 100%;
     order: -1;
+  }
+
+  .pagination > .secondary-button {
+    flex: 1 1 0;
   }
 
   .detail-body {
