@@ -26,7 +26,6 @@ const supabaseClient = window.supabase.createClient(
 
 const elements = {
   accountChip: document.querySelector("#accountChip"),
-  accountEmail: document.querySelector("#accountEmail"),
   addMovieButton: document.querySelector("#addMovieButton"),
   appContent: document.querySelector("#appContent"),
   appStatus: document.querySelector("#appStatus"),
@@ -237,8 +236,6 @@ function renderAuthState() {
   elements.appContent.classList.toggle("is-hidden", !isSignedIn);
   elements.addMovieButton.classList.toggle("is-hidden", !isSignedIn);
   elements.accountChip.classList.toggle("is-hidden", !isSignedIn);
-  elements.accountEmail.textContent = session?.user?.email || "";
-
   if (!isSignedIn) {
     movies = [];
     renderMovies();

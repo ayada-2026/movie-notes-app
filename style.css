@@ -125,22 +125,23 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 0 8px 0 16px;
-  background: rgba(255, 253, 247, 0.82);
-  border: 1px solid rgba(14, 90, 102, 0.16);
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 0;
   border-radius: 8px;
-  color: #4b6570;
+  color: var(--primary);
   font-size: 0.88rem;
   font-weight: 800;
-  box-shadow: 0 10px 22px rgba(14, 90, 102, 0.08);
+  box-shadow: none;
 }
 
-.account-chip span {
-  max-width: min(32vw, 260px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.account-chip .ghost-button {
+  min-height: 44px;
+  padding: 0 16px;
+  background: rgba(255, 253, 247, 0.82);
+  border: 1px solid rgba(14, 90, 102, 0.16);
+  box-shadow: 0 10px 22px rgba(14, 90, 102, 0.08);
 }
 
 .eyebrow {
@@ -905,18 +906,22 @@ small {
   }
 
   .top-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     gap: 8px;
   }
 
   .account-chip {
     width: 100%;
-    justify-content: space-between;
+    justify-content: stretch;
     min-height: 44px;
   }
 
-  .account-chip span {
-    max-width: 100%;
+  .account-chip .ghost-button,
+  .top-actions > .primary-button {
+    width: 100%;
+    min-height: 44px;
+    padding-inline: 10px;
   }
 
   .toolbar,
@@ -926,9 +931,37 @@ small {
   }
 
   .toolbar {
-    gap: 16px;
-    padding: 16px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(122px, 0.8fr);
+    gap: 8px;
+    align-items: stretch;
+    padding: 12px;
     margin-bottom: 14px;
+  }
+
+  .toolbar label {
+    gap: 0;
+    position: relative;
+  }
+
+  .toolbar label > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .toolbar input,
+  .toolbar select {
+    height: 44px;
+  }
+
+  #searchInput {
+    padding-left: 38px;
+    background-position:
+      13px 50%,
+      13px 50%;
   }
 
   .auth-panel {
