@@ -1,18 +1,25 @@
 :root {
   color-scheme: light;
-  --bg: #f6efe2;
-  --paper: #fffaf0;
-  --panel: #fffdf7;
-  --ink: #1f2834;
-  --muted: #6f746f;
-  --line: #decfb8;
-  --accent: #174f49;
-  --accent-strong: #103d39;
-  --accent-soft: #dce8df;
-  --navy: #233340;
-  --sepia: #826442;
+  --bg: #f6f3ea;
+  --bg-soft: #eaf5f7;
+  --card: #fffdf7;
+  --primary: #0e5a66;
+  --primary-soft: #d6eef1;
+  --accent: #6fb7c8;
+  --accent-warm: #d8b879;
+  --text: #172331;
+  --muted: #6e7c83;
+  --border: #d8e1de;
+  --paper: var(--card);
+  --panel: var(--card);
+  --ink: var(--text);
+  --line: var(--border);
+  --accent-strong: #073f4a;
+  --accent-soft: var(--primary-soft);
+  --navy: #1b3344;
+  --sepia: #8d7449;
   --warn: #b44738;
-  --shadow: 0 18px 45px rgba(58, 45, 29, 0.12);
+  --shadow: 0 18px 45px rgba(14, 90, 102, 0.12);
 }
 
 * {
@@ -23,11 +30,13 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(90deg, rgba(31, 40, 52, 0.04) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(130, 100, 66, 0.08), transparent 360px),
+    linear-gradient(90deg, rgba(14, 90, 102, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(111, 183, 200, 0.16), transparent 340px),
+    linear-gradient(135deg, rgba(216, 184, 121, 0.1), transparent 420px),
     var(--bg);
   background-size:
     38px 38px,
+    auto,
     auto;
   color: var(--ink);
   font-family:
@@ -56,10 +65,10 @@ button {
   background:
     repeating-linear-gradient(
       to bottom,
-      rgba(255, 250, 240, 0.58) 0 12px,
+      rgba(234, 245, 247, 0.58) 0 12px,
       transparent 12px 25px
     ),
-    #263233;
+    #0d3e49;
   box-shadow: 1px 0 0 rgba(255, 255, 255, 0.22);
   opacity: 0.72;
   pointer-events: none;
@@ -91,9 +100,9 @@ button {
   width: min(320px, 38vw);
   height: 82px;
   background:
-    radial-gradient(circle at 34px 30px, transparent 0 13px, rgba(23, 79, 73, 0.1) 14px 18px, transparent 19px),
-    radial-gradient(circle at 68px 30px, transparent 0 13px, rgba(23, 79, 73, 0.1) 14px 18px, transparent 19px),
-    linear-gradient(90deg, rgba(35, 51, 64, 0.08), transparent);
+    radial-gradient(circle at 34px 30px, transparent 0 13px, rgba(111, 183, 200, 0.18) 14px 18px, transparent 19px),
+    radial-gradient(circle at 68px 30px, transparent 0 13px, rgba(111, 183, 200, 0.18) 14px 18px, transparent 19px),
+    linear-gradient(90deg, rgba(14, 90, 102, 0.08), transparent);
   border-radius: 8px;
   opacity: 0.6;
   pointer-events: none;
@@ -119,12 +128,12 @@ button {
   min-height: 48px;
   padding: 0 8px 0 16px;
   background: rgba(255, 253, 247, 0.82);
-  border: 1px solid rgba(130, 100, 66, 0.24);
+  border: 1px solid rgba(14, 90, 102, 0.16);
   border-radius: 8px;
-  color: #615846;
+  color: #4b6570;
   font-size: 0.88rem;
   font-weight: 800;
-  box-shadow: 0 10px 22px rgba(58, 45, 29, 0.08);
+  box-shadow: 0 10px 22px rgba(14, 90, 102, 0.08);
 }
 
 .account-chip span {
@@ -136,7 +145,7 @@ button {
 
 .eyebrow {
   margin: 0 0 7px;
-  color: var(--sepia);
+  color: #7e6a45;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -162,7 +171,7 @@ h1 {
 .brand-note {
   display: inline-block;
   margin: 0;
-  color: #6f5635;
+  color: #54727b;
   font-family: "Segoe Print", "Noto Serif KR", serif;
   font-size: clamp(1rem, 2vw, 1.25rem);
   line-height: 1.4;
@@ -175,7 +184,7 @@ h1 {
   height: 1px;
   margin-left: 10px;
   vertical-align: middle;
-  background: rgba(111, 86, 53, 0.65);
+  background: rgba(14, 90, 102, 0.48);
   transform: rotate(-4deg);
 }
 
@@ -198,10 +207,10 @@ h1 {
   justify-content: center;
   gap: 8px;
   padding: 0 20px;
-  background: var(--accent);
+  background: var(--primary);
   color: #fff;
   font-weight: 800;
-  box-shadow: 0 14px 28px rgba(23, 79, 73, 0.26);
+  box-shadow: 0 14px 28px rgba(14, 90, 102, 0.24);
 }
 
 .primary-button span {
@@ -228,9 +237,9 @@ h1 {
   padding: 20px;
   margin-bottom: 18px;
   background: rgba(255, 253, 247, 0.9);
-  border: 1px solid rgba(130, 100, 66, 0.22);
+  border: 1px solid rgba(14, 90, 102, 0.14);
   border-radius: 8px;
-  box-shadow: 0 14px 30px rgba(58, 45, 29, 0.08);
+  box-shadow: 0 14px 30px rgba(14, 90, 102, 0.08);
   backdrop-filter: blur(14px);
 }
 
@@ -242,7 +251,7 @@ h1 {
   min-height: 430px;
   padding: 30px;
   background: rgba(255, 253, 247, 0.86);
-  border: 1px solid rgba(130, 100, 66, 0.22);
+  border: 1px solid rgba(14, 90, 102, 0.14);
   border-radius: 8px;
   box-shadow: 0 14px 34px rgba(37, 43, 50, 0.08);
   backdrop-filter: blur(14px);
@@ -295,8 +304,8 @@ select {
 #searchInput {
   padding-left: 42px;
   background-image:
-    radial-gradient(circle, transparent 0 7px, #7c6645 8px 9px, transparent 10px),
-    linear-gradient(45deg, transparent 0 29px, #7c6645 30px 32px, transparent 33px);
+    radial-gradient(circle, transparent 0 7px, var(--primary) 8px 9px, transparent 10px),
+    linear-gradient(45deg, transparent 0 29px, var(--primary) 30px 32px, transparent 33px);
   background-position:
     15px 50%,
     15px 50%;
@@ -317,7 +326,7 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(47, 111, 115, 0.14);
+  box-shadow: 0 0 0 4px rgba(111, 183, 200, 0.22);
 }
 
 .summary-row {
@@ -342,10 +351,10 @@ textarea:focus {
   flex: 0 0 auto;
   border-radius: 4px;
   background:
-    linear-gradient(90deg, rgba(255, 250, 240, 0.52) 0 4px, transparent 4px 8px),
-    linear-gradient(135deg, #2f3738, #4d4434);
+    linear-gradient(90deg, rgba(234, 245, 247, 0.56) 0 4px, transparent 4px 8px),
+    linear-gradient(135deg, #0e5a66, #1b3344);
   box-shadow:
-    inset 0 7px 0 rgba(255, 250, 240, 0.18),
+    inset 0 7px 0 rgba(234, 245, 247, 0.22),
     inset 0 -7px 0 rgba(0, 0, 0, 0.14);
 }
 
@@ -398,20 +407,20 @@ textarea:focus {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.56), transparent),
     var(--paper);
-  border: 1px solid rgba(130, 100, 66, 0.22);
+  border: 1px solid rgba(14, 90, 102, 0.14);
   border-radius: 8px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.78) inset,
-    0 9px 22px rgba(58, 45, 29, 0.08);
+    0 9px 22px rgba(14, 90, 102, 0.08);
   cursor: pointer;
 }
 
 .movie-card:hover,
 .movie-card:focus-visible {
-  border-color: rgba(23, 79, 73, 0.38);
+  border-color: rgba(111, 183, 200, 0.58);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.78) inset,
-    0 14px 28px rgba(58, 45, 29, 0.11);
+    0 14px 28px rgba(14, 90, 102, 0.12);
   outline: 0;
 }
 
@@ -420,9 +429,9 @@ textarea:focus {
   overflow: hidden;
   width: 100%;
   min-height: 102px;
-  background: #27313b;
+  background: #173c48;
   border-radius: 6px;
-  box-shadow: inset 0 0 0 1px rgba(255, 250, 240, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(234, 245, 247, 0.18);
 }
 
 .poster-frame img {
@@ -441,11 +450,11 @@ textarea:focus {
   background:
     repeating-linear-gradient(
       90deg,
-      rgba(255, 250, 240, 0.18) 0 5px,
+      rgba(234, 245, 247, 0.18) 0 5px,
       transparent 5px 13px
     ),
-    linear-gradient(145deg, #253636 0%, #344c51 48%, #6e5b42 100%);
-  color: #f8f4ea;
+    linear-gradient(145deg, #0e3f49 0%, #286978 50%, #c0a164 100%);
+  color: #f8fcfb;
   text-align: center;
 }
 
@@ -517,7 +526,7 @@ textarea:focus {
 
 .card-title {
   margin: 0;
-  color: #17212c;
+  color: var(--text);
   font-size: 1.2rem;
   font-weight: 900;
   line-height: 1.25;
@@ -529,7 +538,7 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  color: #766b58;
+  color: #63757d;
   font-size: 0.88rem;
   font-weight: 800;
 }
@@ -539,14 +548,14 @@ textarea:focus {
   align-items: center;
   min-height: 28px;
   padding: 0 9px;
-  background: var(--accent);
-  color: #fffaf0;
+  background: var(--primary);
+  color: #f8fcfb;
   border-radius: 999px;
 }
 
 .review-preview {
   margin: 0;
-  color: #404957;
+  color: #344858;
   line-height: 1.52;
   display: -webkit-box;
   overflow: hidden;
@@ -573,7 +582,7 @@ textarea:focus {
 
 .secondary-button {
   padding: 0 13px;
-  background: #eee9df;
+  background: var(--primary-soft);
   color: var(--ink);
   font-weight: 800;
 }
@@ -586,14 +595,14 @@ textarea:focus {
 }
 
 .danger-button {
-  background: #f7e5df;
+  background: #f6e9df;
   color: var(--warn);
 }
 
 .card-actions .secondary-button {
   min-height: 38px;
   background: transparent;
-  color: #6f5635;
+  color: #52717b;
   box-shadow: none;
 }
 
@@ -630,12 +639,12 @@ textarea:focus {
 }
 
 .page-button:hover {
-  border-color: rgba(23, 79, 73, 0.5);
+  border-color: rgba(111, 183, 200, 0.7);
 }
 
 .page-button.is-active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--primary);
+  border-color: var(--primary);
   color: #fff;
 }
 
@@ -653,9 +662,9 @@ textarea:focus {
   align-content: center;
   gap: 12px;
   padding: 36px;
-  border: 1px dashed rgba(130, 100, 66, 0.32);
+  border: 1px dashed rgba(14, 90, 102, 0.22);
   border-radius: 8px;
-  background: rgba(255, 253, 247, 0.6);
+  background: rgba(255, 253, 247, 0.68);
   text-align: center;
 }
 
@@ -678,11 +687,11 @@ textarea:focus {
   background:
     repeating-linear-gradient(
       90deg,
-      rgba(255, 250, 240, 0.16) 0 5px,
+      rgba(234, 245, 247, 0.16) 0 5px,
       transparent 5px 13px
     ),
-    linear-gradient(145deg, #253636 0%, #344c51 48%, #6e5b42 100%);
-  color: #f8f4ea;
+    linear-gradient(145deg, #0e3f49 0%, #286978 50%, #c0a164 100%);
+  color: #f8fcfb;
 }
 
 .empty-poster span {
@@ -739,7 +748,7 @@ textarea:focus {
 .icon-button {
   width: 42px;
   min-height: 42px;
-  background: #eee9df;
+  background: var(--primary-soft);
   color: var(--ink);
   font-weight: 900;
 }
@@ -757,7 +766,7 @@ form {
 }
 
 small {
-  color: #9a5b42;
+  color: #8d7449;
   font-size: 0.78rem;
 }
 
@@ -816,8 +825,8 @@ small {
 
 .detail-poster-frame {
   min-height: 340px;
-  border: 1px solid rgba(130, 100, 66, 0.22);
-  box-shadow: 0 12px 26px rgba(58, 45, 29, 0.12);
+  border: 1px solid rgba(14, 90, 102, 0.16);
+  box-shadow: 0 12px 26px rgba(14, 90, 102, 0.12);
 }
 
 .detail-content {
@@ -833,13 +842,13 @@ small {
 
 .detail-review {
   margin: 0;
-  color: #303948;
+  color: #2f4352;
   font-size: 1.02rem;
   line-height: 1.86;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   padding-top: 14px;
-  border-top: 1px solid rgba(130, 100, 66, 0.2);
+  border-top: 1px solid rgba(14, 90, 102, 0.14);
 }
 
 .detail-actions {
@@ -853,7 +862,7 @@ small {
 @media (max-width: 720px) {
   .film-rail {
     width: 4px;
-    background: #263233;
+    background: #0d3e49;
     opacity: 0.18;
   }
 
