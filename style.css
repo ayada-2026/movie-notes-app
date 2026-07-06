@@ -287,6 +287,7 @@ h1 {
 label {
   display: grid;
   gap: 8px;
+  min-width: 0;
   color: var(--muted);
   font-size: 0.86rem;
   font-weight: 800;
@@ -296,6 +297,8 @@ input,
 select,
 textarea {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(255, 253, 247, 0.96);
@@ -747,15 +750,22 @@ textarea:focus {
   place-items: center;
   padding: 22px;
   background: rgba(16, 21, 27, 0.46);
+  overflow: hidden;
+  touch-action: pan-y;
 }
 
 .modal {
   width: min(680px, 100%);
+  min-width: 0;
   max-height: min(92vh, 840px);
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--panel);
   border-radius: 8px;
   box-shadow: var(--shadow);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .detail-modal {
@@ -911,12 +921,15 @@ form {
   display: grid;
   gap: 17px;
   padding: 22px;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  min-width: 0;
 }
 
 small {
@@ -927,6 +940,7 @@ small {
 .poster-field {
   display: grid;
   gap: 12px;
+  min-width: 0;
 }
 
 .poster-field input[type="file"] {
@@ -1304,11 +1318,12 @@ small {
   .modal-backdrop {
     padding: 10px;
     align-items: end;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 
   .modal {
     width: 100%;
+    max-width: 100%;
     max-height: 94vh;
     border-radius: 10px;
   }
@@ -1319,5 +1334,9 @@ small {
 
   form {
     padding: 18px 16px;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
   }
 }
