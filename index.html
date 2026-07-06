@@ -16,15 +16,6 @@
           <h1>Cinema Note</h1>
           <p class="brand-note">기억하고 싶은 영화, 한 줄의 기록</p>
         </div>
-        <div class="top-actions">
-          <div class="account-chip is-hidden" id="accountChip">
-            <button class="ghost-button" id="signOutButton" type="button">로그아웃</button>
-          </div>
-          <button class="primary-button is-hidden" id="addMovieButton" type="button">
-            <span aria-hidden="true">+</span>
-            새 기록
-          </button>
-        </div>
       </header>
 
       <main>
@@ -54,6 +45,18 @@
         </section>
 
         <section class="app-content is-hidden" id="appContent">
+          <section class="action-bar" aria-label="계정 및 기록 작업">
+            <div class="action-spacer" aria-hidden="true"></div>
+            <div class="top-actions">
+              <div class="account-chip is-hidden" id="accountChip">
+                <button class="ghost-button" id="signOutButton" type="button">로그아웃</button>
+              </div>
+              <button class="primary-button is-hidden" id="addMovieButton" type="button">
+                <span aria-hidden="true">+</span>
+                새 기록
+              </button>
+            </div>
+          </section>
           <section class="toolbar" aria-label="검색 및 정렬">
             <label class="search-field">
               <span>제목 검색</span>
