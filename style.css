@@ -790,7 +790,9 @@ textarea:focus {
   overflow: hidden;
   align-items: flex-start;
   background:
-    radial-gradient(circle at 82% 22%, rgba(120, 210, 224, 0.36), transparent 26%),
+    radial-gradient(circle at 82% 28%, rgba(255, 253, 247, 0.9), transparent 20%),
+    radial-gradient(circle at 86% 40%, rgba(120, 210, 224, 0.36), transparent 32%),
+    linear-gradient(90deg, transparent 0%, rgba(214, 238, 241, 0.34) 58%, rgba(120, 210, 224, 0.18) 100%),
     radial-gradient(circle at 14% 0%, rgba(214, 238, 241, 0.82), transparent 34%),
     linear-gradient(135deg, rgba(232, 249, 250, 0.98) 0%, rgba(250, 255, 251, 0.96) 54%, rgba(255, 250, 235, 0.92) 100%);
   border-bottom-color: rgba(111, 183, 200, 0.28);
@@ -868,11 +870,7 @@ textarea:focus {
   width: clamp(150px, 28%, 220px);
   min-height: 110px;
   margin: -12px -10px -12px 8px;
-  overflow: hidden;
-  border-radius: 0 8px 0 24px;
-  background:
-    radial-gradient(circle at 72% 24%, rgba(255, 253, 247, 0.88), transparent 26%),
-    linear-gradient(145deg, rgba(214, 238, 241, 0.72), rgba(120, 210, 224, 0.16) 68%, rgba(216, 184, 121, 0.16));
+  overflow: visible;
 }
 
 .detail-header .icon-button {
@@ -1279,7 +1277,6 @@ small {
     min-width: 112px;
     min-height: 96px;
     margin: -10px -8px -10px 4px;
-    border-radius: 0 8px 0 20px;
   }
 
   .detail-header .icon-button {
