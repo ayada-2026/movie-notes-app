@@ -79,6 +79,7 @@ const elements = {
 let movies = [];
 let session = null;
 let isSaving = false;
+let isLoadingMovies = false;
 let selectedDetailMovieId = "";
 let currentPage = 1;
 let lastPosterRefreshAt = 0;
@@ -261,6 +262,7 @@ function renderAuthState() {
   elements.addMovieButton.classList.toggle("is-hidden", !isSignedIn);
   elements.accountChip.classList.toggle("is-hidden", !isSignedIn);
   if (!isSignedIn) {
+    isLoadingMovies = false;
     movies = [];
     renderMovies();
     closeModal();
@@ -270,6 +272,16 @@ function renderAuthState() {
 }
 
 function renderMovies() {
+  if (isLoadingMovies) {
+    elements.resultSummary.textContent = "";
+    elements.clearSearchButton.disabled = true;
+    elements.movieGrid.innerHTML = "";
+    elements.emptyState.classList.add("is-hidden");
+    elements.movieGrid.classList.add("is-hidden");
+    elements.pagination.classList.add("is-hidden");
+    return;
+  }
+
   const visibleMovies = getVisibleMovies();
   const hasSearch = elements.searchInput.value.trim().length > 0;
   clampCurrentPage(visibleMovies.length);
@@ -395,6 +407,8 @@ async function loadMoviesFromDb() {
     return;
   }
 
+  isLoadingMovies = true;
+  renderMovies();
   setStatus("불러오는 중");
 
   const { data, error } = await supabaseClient
@@ -404,11 +418,14 @@ async function loadMoviesFromDb() {
     .order("created_at", { ascending: false });
 
   if (error) {
+    isLoadingMovies = false;
+    renderMovies();
     setStatus("목록을 불러오지 못했습니다");
     return;
   }
 
   movies = await hydratePosterUrls(data.map(mapMovieFromDb));
+  isLoadingMovies = false;
   renderMovies();
   setStatus("");
 }
@@ -854,7 +871,6 @@ function handleVisibilityChange() {
 }
 
 async function initializeApp() {
-  renderMovies();
   setStatus("세션 확인 중");
 
   const {
