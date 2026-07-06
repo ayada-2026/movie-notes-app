@@ -8,6 +8,7 @@ const SIGNED_URL_REFRESH_BUFFER_MS = 5 * 60 * 1000;
 const MOVIES_PER_PAGE = 20;
 const MOVIE_CACHE_KEY = "cinemaNote.cachedMovies.v1";
 const LOGIN_HINT_KEY = "cinemaNote.hasSignedIn.v1";
+const POSTER_URL_CACHE_KEY = "cinemaNote.posterUrls.v1";
 
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
@@ -86,6 +87,7 @@ let hasRenderedCachedMovies = false;
 let selectedDetailMovieId = "";
 let currentPage = 1;
 let lastPosterRefreshAt = 0;
+let posterHydrationRun = 0;
 
 const posterUrlCache = new Map();
 
@@ -174,15 +176,68 @@ function isStoragePoster(value) {
   return Boolean(value) && !isExternalPoster(value);
 }
 
-function getCachedPosterUrl(poster) {
-  const cached = posterUrlCache.get(poster);
+function getStoredPosterUrlCache() {
+  try {
+    const cachedValue = localStorage.getItem(POSTER_URL_CACHE_KEY);
+    if (!cachedValue) {
+      return {};
+    }
 
-  if (!cached) {
+    const parsedCache = JSON.parse(cachedValue);
+    return parsedCache && typeof parsedCache === "object" && !Array.isArray(parsedCache)
+      ? parsedCache
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+function storePosterUrlCacheEntry(poster, cacheEntry) {
+  try {
+    const storedCache = getStoredPosterUrlCache();
+    storedCache[poster] = cacheEntry;
+    localStorage.setItem(POSTER_URL_CACHE_KEY, JSON.stringify(storedCache));
+  } catch {
+    // Signed URL cache is optional; expired URLs can always be regenerated.
+  }
+}
+
+function removeStoredPosterUrlCacheEntry(poster) {
+  try {
+    const storedCache = getStoredPosterUrlCache();
+    delete storedCache[poster];
+    localStorage.setItem(POSTER_URL_CACHE_KEY, JSON.stringify(storedCache));
+  } catch {
+    // Ignore cache cleanup failures.
+  }
+}
+
+function getStoredPosterUrl(poster) {
+  const cached = getStoredPosterUrlCache()[poster];
+
+  if (!cached?.url || !cached?.expiresAt) {
     return "";
   }
 
   if (cached.expiresAt <= Date.now() + SIGNED_URL_REFRESH_BUFFER_MS) {
+    removeStoredPosterUrlCacheEntry(poster);
+    return "";
+  }
+
+  posterUrlCache.set(poster, cached);
+  return cached.url;
+}
+
+function getCachedPosterUrl(poster) {
+  const cached = posterUrlCache.get(poster);
+
+  if (!cached) {
+    return getStoredPosterUrl(poster);
+  }
+
+  if (cached.expiresAt <= Date.now() + SIGNED_URL_REFRESH_BUFFER_MS) {
     posterUrlCache.delete(poster);
+    removeStoredPosterUrlCacheEntry(poster);
     return "";
   }
 
@@ -213,10 +268,13 @@ async function resolvePosterUrl(poster, options = {}) {
     return "";
   }
 
-  posterUrlCache.set(poster, {
+  const cacheEntry = {
     url: data.signedUrl,
     expiresAt: Date.now() + SIGNED_URL_TTL_SECONDS * 1000,
-  });
+  };
+
+  posterUrlCache.set(poster, cacheEntry);
+  storePosterUrlCacheEntry(poster, cacheEntry);
 
   return data.signedUrl;
 }
@@ -240,6 +298,32 @@ function movieToDbPayload(posterValue) {
   };
 }
 
+function applyCachedPosterUrl(movie) {
+  return {
+    ...movie,
+    posterUrl: isExternalPoster(movie.poster) ? movie.poster : getCachedPosterUrl(movie.poster),
+  };
+}
+
+function areMovieListsEquivalent(currentMovies, nextMovies) {
+  if (currentMovies.length !== nextMovies.length) {
+    return false;
+  }
+
+  return currentMovies.every((movie, index) => {
+    const nextMovie = nextMovies[index];
+    return (
+      movie.id === nextMovie.id &&
+      movie.title === nextMovie.title &&
+      movie.releaseYear === nextMovie.releaseYear &&
+      movie.watchedDate === nextMovie.watchedDate &&
+      movie.review === nextMovie.review &&
+      movie.poster === nextMovie.poster &&
+      movie.updatedAt === nextMovie.updatedAt
+    );
+  });
+}
+
 function getCachedMovies() {
   try {
     const cachedValue = localStorage.getItem(MOVIE_CACHE_KEY);
@@ -252,10 +336,7 @@ function getCachedMovies() {
       return [];
     }
 
-    return parsedMovies.map((movie) => ({
-      ...movie,
-      posterUrl: "",
-    }));
+    return parsedMovies.map(applyCachedPosterUrl);
   } catch {
     return [];
   }
@@ -275,6 +356,7 @@ function clearCachedSessionState() {
   try {
     localStorage.removeItem(MOVIE_CACHE_KEY);
     localStorage.removeItem(LOGIN_HINT_KEY);
+    localStorage.removeItem(POSTER_URL_CACHE_KEY);
   } catch {
     // Ignore storage failures during sign-out cleanup.
   }
@@ -373,6 +455,7 @@ function renderMovies() {
   elements.emptyState.classList.toggle("is-hidden", visibleMovies.length > 0);
   elements.movieGrid.classList.toggle("is-hidden", visibleMovies.length === 0);
   renderPagination(pageCount, visibleMovies.length);
+  hydrateVisiblePosterUrls();
 
   if (visibleMovies.length === 0 && hasSearch) {
     elements.emptyState.querySelector("h2").textContent = "검색 결과가 없습니다";
@@ -442,14 +525,22 @@ function renderPosterMarkup(movie, className = "poster-frame") {
   const safeTitle = escapeHtml(movie.title);
   const safePoster = movie.posterUrl ? escapeHtml(movie.posterUrl) : "";
   const safePosterPath = movie.poster ? escapeHtml(movie.poster) : "";
+  const safeMovieId = escapeHtml(movie.id);
+  const frameAttributes = [
+    `class="${className}"`,
+    `data-movie-id="${safeMovieId}"`,
+    safePosterPath ? `data-poster-path="${safePosterPath}"` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (!safePoster) {
-    return `<div class="${className}"><div class="poster-placeholder" aria-hidden="true"><span></span></div></div>`;
+    return `<div ${frameAttributes}><div class="poster-placeholder" aria-hidden="true"><span></span></div></div>`;
   }
 
   return `
-    <div class="${className}">
-      <img src="${safePoster}" alt="${safeTitle} 포스터" loading="lazy" data-poster-path="${safePosterPath}" />
+    <div ${frameAttributes}>
+      <img class="poster-image" src="${safePoster}" alt="${safeTitle} 포스터" loading="lazy" data-poster-path="${safePosterPath}" />
       <div class="poster-placeholder is-hidden" aria-hidden="true"><span></span></div>
     </div>
   `;
@@ -478,6 +569,67 @@ function renderMovieCard(movie) {
   `;
 }
 
+function setMoviePosterUrl(movieId, posterUrl) {
+  movies = movies.map((movie) => (movie.id === movieId ? { ...movie, posterUrl } : movie));
+}
+
+function updatePosterFrame(frame, movie, posterUrl) {
+  if (!frame || !posterUrl) {
+    return;
+  }
+
+  const existingImage = frame.querySelector("img");
+  const placeholder = frame.querySelector(".poster-placeholder");
+
+  if (existingImage?.src === posterUrl) {
+    return;
+  }
+
+  const image = existingImage || document.createElement("img");
+  image.className = "poster-image";
+  image.alt = `${movie.title} 포스터`;
+  image.loading = "lazy";
+  image.dataset.posterPath = movie.poster;
+  image.classList.remove("is-loaded");
+  image.classList.remove("is-hidden");
+
+  if (!existingImage) {
+    frame.prepend(image);
+  }
+
+  image.src = posterUrl;
+  placeholder?.classList.add("is-hidden");
+}
+
+async function hydrateVisiblePosterUrls(options = {}) {
+  const visibleMovies = getPageItems(getVisibleMovies()).filter((movie) =>
+    isStoragePoster(movie.poster),
+  );
+
+  if (visibleMovies.length === 0) {
+    return;
+  }
+
+  const runId = (posterHydrationRun += 1);
+
+  await Promise.all(
+    visibleMovies.map(async (movie) => {
+      const posterUrl = await resolvePosterUrl(movie.poster, options);
+
+      if (!posterUrl || runId !== posterHydrationRun) {
+        return;
+      }
+
+      setMoviePosterUrl(movie.id, posterUrl);
+
+      const frame = elements.movieGrid.querySelector(
+        `.poster-frame[data-movie-id="${movie.id}"]`,
+      );
+      updatePosterFrame(frame, movie, posterUrl);
+    }),
+  );
+}
+
 async function loadMoviesFromDb() {
   if (!session?.user) {
     return;
@@ -500,15 +652,19 @@ async function loadMoviesFromDb() {
     return;
   }
 
-  movies = data.map(mapMovieFromDb);
+  const serverMovies = data.map(mapMovieFromDb).map(applyCachedPosterUrl);
+  const shouldRenderServerMovies =
+    isLoadingMovies || !areMovieListsEquivalent(movies, serverMovies);
+  movies = serverMovies;
   storeCachedMovies(movies);
   hasRenderedCachedMovies = false;
   isLoadingMovies = false;
-  renderMovies();
+  if (shouldRenderServerMovies) {
+    renderMovies();
+  } else {
+    hydrateVisiblePosterUrls();
+  }
   setStatus("");
-
-  movies = await hydratePosterUrls(movies);
-  renderMovies();
 }
 
 function updatePosterHelp(movie = null) {
@@ -568,6 +724,17 @@ function openDetail(movie) {
   elements.detailReview.textContent = movie.review || "감상이 비어 있습니다.";
   elements.detailPoster.innerHTML = renderPosterMarkup(movie, "poster-frame detail-poster-frame");
   elements.detailModal.classList.remove("is-hidden");
+
+  if (isStoragePoster(movie.poster) && !movie.posterUrl) {
+    refreshMoviePoster(movie.id).then((updatedMovie) => {
+      if (!updatedMovie?.posterUrl || selectedDetailMovieId !== movie.id) {
+        return;
+      }
+
+      const frame = elements.detailPoster.querySelector(".detail-poster-frame");
+      updatePosterFrame(frame, updatedMovie, updatedMovie.posterUrl);
+    });
+  }
 }
 
 function closeDetail() {
@@ -599,14 +766,15 @@ async function refreshVisiblePosterUrls(options = {}) {
 
   lastPosterRefreshAt = Date.now();
 
-  const refreshedMovies = await hydratePosterUrls(movies, options);
-  movies = refreshedMovies;
-  renderMovies();
+  await hydrateVisiblePosterUrls(options);
 
   if (selectedDetailMovieId && !elements.detailModal.classList.contains("is-hidden")) {
-    const detailMovie = movies.find((movie) => movie.id === selectedDetailMovieId);
-    if (detailMovie) {
-      openDetail(detailMovie);
+    const detailMovie = await refreshMoviePoster(selectedDetailMovieId, options);
+    if (detailMovie?.posterUrl) {
+      elements.detailPoster.innerHTML = renderPosterMarkup(
+        detailMovie,
+        "poster-frame detail-poster-frame",
+      );
     }
   }
 }
@@ -630,6 +798,7 @@ async function handlePosterImageError(event) {
 
   image.dataset.retryingPoster = "true";
   posterUrlCache.delete(posterPath);
+  removeStoredPosterUrlCacheEntry(posterPath);
 
   const updatedMovie = await refreshMoviePoster(movieId, { forceRefresh: true });
   if (!updatedMovie?.posterUrl) {
@@ -643,6 +812,15 @@ async function handlePosterImageError(event) {
   } else {
     openDetail(updatedMovie);
   }
+}
+
+function handlePosterImageLoad(event) {
+  const image = event.target.closest("img[data-poster-path]");
+  if (!image) {
+    return;
+  }
+
+  image.classList.add("is-loaded");
 }
 
 function validateForm() {
@@ -727,6 +905,7 @@ async function uploadPosterFile(file) {
   }
 
   posterUrlCache.delete(path);
+  removeStoredPosterUrlCacheEntry(path);
   return path;
 }
 
@@ -803,6 +982,7 @@ async function handleSubmit(event) {
     if (isStoragePoster(posterValue) && posterValue !== previousMovie?.poster) {
       await supabaseClient.storage.from(STORAGE_BUCKET).remove([posterValue]);
       posterUrlCache.delete(posterValue);
+      removeStoredPosterUrlCacheEntry(posterValue);
     }
 
     setFormError("저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
@@ -818,6 +998,7 @@ async function handleSubmit(event) {
   ) {
     await supabaseClient.storage.from(STORAGE_BUCKET).remove([previousMovie.poster]);
     posterUrlCache.delete(previousMovie.poster);
+    removeStoredPosterUrlCacheEntry(previousMovie.poster);
   }
 
   if (id) {
@@ -827,6 +1008,7 @@ async function handleSubmit(event) {
     currentPage = 1;
   }
 
+  storeCachedMovies(movies);
   renderMovies();
   closeModal();
 
@@ -846,9 +1028,11 @@ async function deleteMovie(movie) {
   if (isStoragePoster(movie.poster)) {
     await supabaseClient.storage.from(STORAGE_BUCKET).remove([movie.poster]);
     posterUrlCache.delete(movie.poster);
+    removeStoredPosterUrlCacheEntry(movie.poster);
   }
 
   movies = movies.filter((item) => item.id !== movie.id);
+  storeCachedMovies(movies);
   renderMovies();
   setStatus("");
   return true;
@@ -995,9 +1179,11 @@ elements.form.addEventListener("submit", handleSubmit);
 elements.movieGrid.addEventListener("click", handleGridClick);
 elements.movieGrid.addEventListener("keydown", handleGridKeydown);
 elements.movieGrid.addEventListener("error", handlePosterImageError, true);
+elements.movieGrid.addEventListener("load", handlePosterImageLoad, true);
 elements.modal.addEventListener("click", handleBackdropClick);
 elements.detailModal.addEventListener("click", handleBackdropClick);
 elements.detailPoster.addEventListener("error", handlePosterImageError, true);
+elements.detailPoster.addEventListener("load", handlePosterImageLoad, true);
 elements.closeDetailButton.addEventListener("click", closeDetail);
 elements.detailDeleteButton.addEventListener("click", handleDetailDelete);
 elements.detailEditButton.addEventListener("click", handleDetailEdit);
