@@ -3,7 +3,8 @@ const SUPABASE_URL = "https://zjolzipsoqsczilhgqwq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KYwwO9ZHOAg4T45dzCAXsg_fJbShoXd";
 const STORAGE_BUCKET = "movie-posters";
 const MAX_POSTER_FILE_SIZE = 5 * 1024 * 1024;
-const SIGNED_URL_TTL_SECONDS = 60 * 60;
+const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24;
+const SIGNED_URL_REFRESH_BUFFER_MS = 5 * 60 * 1000;
 const MOVIES_PER_PAGE = 20;
 
 const isVercelPreviewHost =
@@ -80,6 +81,7 @@ let session = null;
 let isSaving = false;
 let selectedDetailMovieId = "";
 let currentPage = 1;
+let lastPosterRefreshAt = 0;
 
 const posterUrlCache = new Map();
 
@@ -168,7 +170,22 @@ function isStoragePoster(value) {
   return Boolean(value) && !isExternalPoster(value);
 }
 
-async function resolvePosterUrl(poster) {
+function getCachedPosterUrl(poster) {
+  const cached = posterUrlCache.get(poster);
+
+  if (!cached) {
+    return "";
+  }
+
+  if (cached.expiresAt <= Date.now() + SIGNED_URL_REFRESH_BUFFER_MS) {
+    posterUrlCache.delete(poster);
+    return "";
+  }
+
+  return cached.url;
+}
+
+async function resolvePosterUrl(poster, options = {}) {
   if (!poster) {
     return "";
   }
@@ -177,8 +194,11 @@ async function resolvePosterUrl(poster) {
     return poster;
   }
 
-  if (posterUrlCache.has(poster)) {
-    return posterUrlCache.get(poster);
+  if (!options.forceRefresh) {
+    const cachedUrl = getCachedPosterUrl(poster);
+    if (cachedUrl) {
+      return cachedUrl;
+    }
   }
 
   const { data, error } = await supabaseClient.storage
@@ -189,15 +209,19 @@ async function resolvePosterUrl(poster) {
     return "";
   }
 
-  posterUrlCache.set(poster, data.signedUrl);
+  posterUrlCache.set(poster, {
+    url: data.signedUrl,
+    expiresAt: Date.now() + SIGNED_URL_TTL_SECONDS * 1000,
+  });
+
   return data.signedUrl;
 }
 
-async function hydratePosterUrls(items) {
+async function hydratePosterUrls(items, options = {}) {
   return Promise.all(
     items.map(async (movie) => ({
       ...movie,
-      posterUrl: await resolvePosterUrl(movie.poster),
+      posterUrl: await resolvePosterUrl(movie.poster, options),
     })),
   );
 }
@@ -337,6 +361,7 @@ function resetPageAndRender() {
 function renderPosterMarkup(movie, className = "poster-frame") {
   const safeTitle = escapeHtml(movie.title);
   const safePoster = movie.posterUrl ? escapeHtml(movie.posterUrl) : "";
+  const safePosterPath = movie.poster ? escapeHtml(movie.poster) : "";
 
   if (!safePoster) {
     return `<div class="${className}"><div class="poster-placeholder" aria-hidden="true"><span></span></div></div>`;
@@ -344,7 +369,7 @@ function renderPosterMarkup(movie, className = "poster-frame") {
 
   return `
     <div class="${className}">
-      <img src="${safePoster}" alt="${safeTitle} 포스터" loading="lazy" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.remove('is-hidden');" />
+      <img src="${safePoster}" alt="${safeTitle} 포스터" loading="lazy" data-poster-path="${safePosterPath}" />
       <div class="poster-placeholder is-hidden" aria-hidden="true"><span></span></div>
     </div>
   `;
@@ -458,6 +483,76 @@ function openDetail(movie) {
 function closeDetail() {
   selectedDetailMovieId = "";
   elements.detailModal.classList.add("is-hidden");
+}
+
+async function refreshMoviePoster(movieId, options = {}) {
+  const movie = movies.find((item) => item.id === movieId);
+
+  if (!movie || !isStoragePoster(movie.poster)) {
+    return null;
+  }
+
+  const posterUrl = await resolvePosterUrl(movie.poster, options);
+  const updatedMovie = { ...movie, posterUrl };
+  movies = movies.map((item) => (item.id === movieId ? updatedMovie : item));
+  return updatedMovie;
+}
+
+async function refreshVisiblePosterUrls(options = {}) {
+  if (!session?.user || movies.length === 0) {
+    return;
+  }
+
+  if (!options.forceRefresh && Date.now() - lastPosterRefreshAt < 30 * 1000) {
+    return;
+  }
+
+  lastPosterRefreshAt = Date.now();
+
+  const refreshedMovies = await hydratePosterUrls(movies, options);
+  movies = refreshedMovies;
+  renderMovies();
+
+  if (selectedDetailMovieId && !elements.detailModal.classList.contains("is-hidden")) {
+    const detailMovie = movies.find((movie) => movie.id === selectedDetailMovieId);
+    if (detailMovie) {
+      openDetail(detailMovie);
+    }
+  }
+}
+
+async function handlePosterImageError(event) {
+  const image = event.target.closest("img[data-poster-path]");
+  if (!image) {
+    return;
+  }
+
+  const posterPath = image.dataset.posterPath;
+  const card = image.closest(".movie-card");
+  const movieId = card?.dataset.id || selectedDetailMovieId;
+
+  image.classList.add("is-hidden");
+  image.nextElementSibling?.classList.remove("is-hidden");
+
+  if (!posterPath || image.dataset.retryingPoster === "true") {
+    return;
+  }
+
+  image.dataset.retryingPoster = "true";
+  posterUrlCache.delete(posterPath);
+
+  const updatedMovie = await refreshMoviePoster(movieId, { forceRefresh: true });
+  if (!updatedMovie?.posterUrl) {
+    return;
+  }
+
+  if (card) {
+    image.src = updatedMovie.posterUrl;
+    image.classList.remove("is-hidden");
+    image.nextElementSibling?.classList.add("is-hidden");
+  } else {
+    openDetail(updatedMovie);
+  }
 }
 
 function validateForm() {
@@ -756,6 +851,16 @@ function handleDetailEdit() {
   openModal(movie);
 }
 
+function handleWindowFocus() {
+  refreshVisiblePosterUrls();
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState === "visible") {
+    refreshVisiblePosterUrls();
+  }
+}
+
 async function initializeApp() {
   renderMovies();
   setStatus("세션 확인 중");
@@ -796,8 +901,10 @@ elements.cancelButton.addEventListener("click", closeModal);
 elements.form.addEventListener("submit", handleSubmit);
 elements.movieGrid.addEventListener("click", handleGridClick);
 elements.movieGrid.addEventListener("keydown", handleGridKeydown);
+elements.movieGrid.addEventListener("error", handlePosterImageError, true);
 elements.modal.addEventListener("click", handleBackdropClick);
 elements.detailModal.addEventListener("click", handleBackdropClick);
+elements.detailPoster.addEventListener("error", handlePosterImageError, true);
 elements.closeDetailButton.addEventListener("click", closeDetail);
 elements.detailDeleteButton.addEventListener("click", handleDetailDelete);
 elements.detailEditButton.addEventListener("click", handleDetailEdit);
@@ -820,5 +927,7 @@ elements.clearSearchButton.addEventListener("click", () => {
   resetPageAndRender();
 });
 document.addEventListener("keydown", handleKeydown);
+document.addEventListener("visibilitychange", handleVisibilityChange);
+window.addEventListener("focus", handleWindowFocus);
 
 initializeApp();
