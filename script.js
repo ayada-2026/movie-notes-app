@@ -6,6 +6,8 @@ const MAX_POSTER_FILE_SIZE = 5 * 1024 * 1024;
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24;
 const SIGNED_URL_REFRESH_BUFFER_MS = 5 * 60 * 1000;
 const MOVIES_PER_PAGE = 20;
+const MOVIE_CACHE_KEY = "cinemaNote.cachedMovies.v1";
+const LOGIN_HINT_KEY = "cinemaNote.hasSignedIn.v1";
 
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
@@ -80,6 +82,7 @@ let movies = [];
 let session = null;
 let isSaving = false;
 let isLoadingMovies = false;
+let hasRenderedCachedMovies = false;
 let selectedDetailMovieId = "";
 let currentPage = 1;
 let lastPosterRefreshAt = 0;
@@ -237,6 +240,78 @@ function movieToDbPayload(posterValue) {
   };
 }
 
+function getCachedMovies() {
+  try {
+    const cachedValue = localStorage.getItem(MOVIE_CACHE_KEY);
+    if (!cachedValue) {
+      return [];
+    }
+
+    const parsedMovies = JSON.parse(cachedValue);
+    if (!Array.isArray(parsedMovies)) {
+      return [];
+    }
+
+    return parsedMovies.map((movie) => ({
+      ...movie,
+      posterUrl: "",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function storeCachedMovies(nextMovies) {
+  try {
+    const cachePayload = nextMovies.map(({ posterUrl, ...movie }) => movie);
+    localStorage.setItem(MOVIE_CACHE_KEY, JSON.stringify(cachePayload));
+    localStorage.setItem(LOGIN_HINT_KEY, "true");
+  } catch {
+    // Cache is a UX optimization only; Supabase remains the source of truth.
+  }
+}
+
+function clearCachedSessionState() {
+  try {
+    localStorage.removeItem(MOVIE_CACHE_KEY);
+    localStorage.removeItem(LOGIN_HINT_KEY);
+  } catch {
+    // Ignore storage failures during sign-out cleanup.
+  }
+
+  posterUrlCache.clear();
+  hasRenderedCachedMovies = false;
+}
+
+function renderCachedMoviesIfAvailable() {
+  let cachedMovies = [];
+
+  try {
+    if (localStorage.getItem(LOGIN_HINT_KEY) !== "true") {
+      return false;
+    }
+
+    cachedMovies = getCachedMovies();
+  } catch {
+    return false;
+  }
+
+  if (cachedMovies.length === 0) {
+    return false;
+  }
+
+  movies = cachedMovies;
+  hasRenderedCachedMovies = true;
+  isLoadingMovies = false;
+  elements.authView.classList.add("is-hidden");
+  elements.appContent.classList.remove("is-hidden");
+  elements.addMovieButton.classList.remove("is-hidden");
+  elements.accountChip.classList.remove("is-hidden");
+  renderMovies();
+  setStatus("");
+  return true;
+}
+
 function setStatus(message = "") {
   elements.appStatus.textContent = message;
 }
@@ -263,6 +338,7 @@ function renderAuthState() {
   elements.accountChip.classList.toggle("is-hidden", !isSignedIn);
   if (!isSignedIn) {
     isLoadingMovies = false;
+    clearCachedSessionState();
     movies = [];
     renderMovies();
     closeModal();
@@ -407,9 +483,9 @@ async function loadMoviesFromDb() {
     return;
   }
 
-  isLoadingMovies = true;
+  isLoadingMovies = !hasRenderedCachedMovies;
   renderMovies();
-  setStatus("불러오는 중");
+  setStatus(hasRenderedCachedMovies ? "" : "불러오는 중");
 
   const { data, error } = await supabaseClient
     .from("movie_notes")
@@ -424,10 +500,15 @@ async function loadMoviesFromDb() {
     return;
   }
 
-  movies = await hydratePosterUrls(data.map(mapMovieFromDb));
+  movies = data.map(mapMovieFromDb);
+  storeCachedMovies(movies);
+  hasRenderedCachedMovies = false;
   isLoadingMovies = false;
   renderMovies();
   setStatus("");
+
+  movies = await hydratePosterUrls(movies);
+  renderMovies();
 }
 
 function updatePosterHelp(movie = null) {
@@ -614,6 +695,7 @@ async function handleAuthSubmit(event) {
 
 async function handleSignOut() {
   setStatus("로그아웃 중");
+  clearCachedSessionState();
   await supabaseClient.auth.signOut();
 }
 
@@ -871,7 +953,8 @@ function handleVisibilityChange() {
 }
 
 async function initializeApp() {
-  setStatus("세션 확인 중");
+  const renderedFromCache = renderCachedMoviesIfAvailable();
+  setStatus(renderedFromCache ? "" : "세션 확인 중");
 
   const {
     data: { session: currentSession },
@@ -879,6 +962,8 @@ async function initializeApp() {
   } = await supabaseClient.auth.getSession();
 
   if (error) {
+    elements.authView.classList.remove("is-hidden");
+    elements.appContent.classList.add("is-hidden");
     setAuthError("로그인 상태를 확인하지 못했습니다.");
     setStatus("");
     return;
