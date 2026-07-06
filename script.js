@@ -368,10 +368,6 @@ function renderMovieCard(movie) {
           </div>
           <p class="review-preview">${safeReview}</p>
         </div>
-        <div class="card-actions">
-          <button class="secondary-button" type="button" data-action="edit">수정</button>
-          <button class="secondary-button danger-button" type="button" data-action="delete">삭제</button>
-        </div>
       </div>
     </article>
   `;
@@ -684,24 +680,7 @@ async function handleGridClick(event) {
     return;
   }
 
-  const button = event.target.closest("button[data-action]");
-
-  if (!button) {
-    openDetail(movie);
-    return;
-  }
-
-  if (button.dataset.action === "edit") {
-    openModal(movie);
-    return;
-  }
-
-  const confirmed = confirm(`"${movie.title}" 기록을 삭제할까요?`);
-  if (!confirmed) {
-    return;
-  }
-
-  await deleteMovie(movie);
+  openDetail(movie);
 }
 
 function handleGridKeydown(event) {
@@ -710,7 +689,7 @@ function handleGridKeydown(event) {
   }
 
   const card = event.target.closest(".movie-card");
-  if (!card || event.target.closest("button")) {
+  if (!card) {
     return;
   }
 

@@ -84,20 +84,20 @@ button {
 
 .topbar {
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 168px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+  min-height: 260px;
   margin-bottom: 18px;
   padding: 24px 26px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 12% 22%, rgba(255, 255, 255, 0.68) 0 1px, transparent 2px),
-    radial-gradient(circle at 26% 36%, rgba(255, 255, 255, 0.45) 0 1px, transparent 2px),
-    radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.56) 0 1px, transparent 2px),
-    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.42) 0 1px, transparent 2px),
-    linear-gradient(135deg, #13283e 0%, #0d4758 56%, #2c6d7c 100%);
+    linear-gradient(90deg, rgba(7, 19, 36, 0.78) 0%, rgba(7, 19, 36, 0.42) 42%, rgba(7, 19, 36, 0.08) 100%),
+    linear-gradient(180deg, rgba(7, 19, 36, 0.1), rgba(7, 19, 36, 0.22)),
+    url("assets/images/cinema-night-header.jpg");
+  background-position: center;
+  background-size: cover;
   border: 1px solid rgba(111, 183, 200, 0.22);
   border-radius: 14px;
   box-shadow: 0 18px 42px rgba(14, 61, 74, 0.2);
@@ -106,33 +106,39 @@ button {
 .topbar::after {
   content: "";
   position: absolute;
-  right: -28px;
-  bottom: -42px;
-  width: min(430px, 48vw);
-  height: 150px;
+  inset: 0;
   background:
-    radial-gradient(circle at 34% 46%, rgba(214, 238, 241, 0.22) 0 34px, transparent 35px),
-    radial-gradient(circle at 62% 38%, rgba(216, 184, 121, 0.16) 0 54px, transparent 55px),
-    linear-gradient(90deg, rgba(214, 238, 241, 0.16), transparent);
-  border-radius: 999px;
-  opacity: 0.9;
+    radial-gradient(circle at 18% 16%, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 28% 30%, rgba(214, 238, 241, 0.42) 0 1px, transparent 2px),
+    radial-gradient(circle at 44% 18%, rgba(255, 255, 255, 0.44) 0 1px, transparent 2px);
+  opacity: 0.75;
   pointer-events: none;
 }
 
 .brand-block {
   position: relative;
   z-index: 2;
-  max-width: min(100%, 620px);
+  max-width: min(100%, 560px);
 }
 
 .top-actions {
   position: relative;
   z-index: 3;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topbar .primary-button {
+  background: #f8fcfb;
+  color: var(--primary);
+  box-shadow: 0 10px 22px rgba(5, 18, 28, 0.18);
+}
+
+.topbar .primary-button:hover {
+  background: var(--primary-soft);
 }
 
 .account-chip {
@@ -153,9 +159,11 @@ button {
 .account-chip .ghost-button {
   min-height: 44px;
   padding: 0 16px;
-  background: rgba(255, 253, 247, 0.82);
-  border: 1px solid rgba(14, 90, 102, 0.16);
-  box-shadow: 0 10px 22px rgba(14, 90, 102, 0.08);
+  background: rgba(255, 253, 247, 0.18);
+  border: 1px solid rgba(255, 253, 247, 0.28);
+  color: #f8fcfb;
+  box-shadow: 0 10px 22px rgba(5, 18, 28, 0.12);
+  backdrop-filter: blur(10px);
 }
 
 .eyebrow {
@@ -201,167 +209,6 @@ h1 {
   vertical-align: middle;
   background: rgba(214, 238, 241, 0.58);
   transform: rotate(-4deg);
-}
-
-.night-illustration {
-  position: absolute;
-  right: 28px;
-  bottom: 16px;
-  z-index: 2;
-  width: 190px;
-  height: 104px;
-  opacity: 0.94;
-  pointer-events: none;
-}
-
-.night-illustration::before,
-.night-illustration::after {
-  content: "";
-  position: absolute;
-  border-radius: 999px;
-  background: rgba(255, 253, 247, 0.86);
-  box-shadow:
-    28px -18px 0 -3px rgba(255, 253, 247, 0.72),
-    72px -6px 0 -4px rgba(214, 238, 241, 0.68),
-    116px -24px 0 -4px rgba(255, 253, 247, 0.6);
-}
-
-.night-illustration::before {
-  top: 6px;
-  right: 4px;
-  width: 6px;
-  height: 6px;
-}
-
-.night-illustration::after {
-  top: 18px;
-  left: 12px;
-  width: 4px;
-  height: 4px;
-}
-
-.tv-screen {
-  position: absolute;
-  right: 2px;
-  bottom: 30px;
-  width: 74px;
-  height: 52px;
-  border: 5px solid rgba(214, 238, 241, 0.55);
-  border-radius: 10px;
-  background:
-    radial-gradient(circle at 36% 42%, rgba(255, 253, 247, 0.72), transparent 16px),
-    linear-gradient(135deg, #13283e, #245e70);
-  box-shadow: 0 12px 22px rgba(5, 18, 28, 0.24);
-}
-
-.tv-screen::before,
-.tv-screen::after {
-  content: "";
-  position: absolute;
-  bottom: -15px;
-  width: 20px;
-  height: 4px;
-  background: rgba(214, 238, 241, 0.62);
-  border-radius: 999px;
-}
-
-.tv-screen::before {
-  left: 13px;
-  transform: rotate(-24deg);
-}
-
-.tv-screen::after {
-  right: 13px;
-  transform: rotate(24deg);
-}
-
-.sofa {
-  position: absolute;
-  left: 8px;
-  bottom: 0;
-  width: 112px;
-  height: 48px;
-  border-radius: 20px 20px 14px 14px;
-  background: linear-gradient(180deg, #6fb7c8, #327f90);
-  box-shadow:
-    inset 0 -10px 0 rgba(14, 90, 102, 0.28),
-    0 14px 24px rgba(5, 18, 28, 0.22);
-}
-
-.sofa::before,
-.sofa::after {
-  content: "";
-  position: absolute;
-  bottom: 4px;
-  width: 26px;
-  height: 34px;
-  border-radius: 14px;
-  background: #246b7b;
-}
-
-.sofa::before {
-  left: -10px;
-}
-
-.sofa::after {
-  right: -10px;
-}
-
-.character-head {
-  position: absolute;
-  left: 45px;
-  top: -26px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #f2caa2;
-  box-shadow: inset 0 7px 0 #2d2a31;
-}
-
-.character-body {
-  position: absolute;
-  left: 37px;
-  top: 1px;
-  width: 44px;
-  height: 34px;
-  border-radius: 18px 18px 10px 10px;
-  background: #fff4dc;
-}
-
-.popcorn-cup,
-.cola-cup {
-  position: absolute;
-  bottom: 10px;
-  border-radius: 5px 5px 9px 9px;
-  box-shadow: 0 8px 14px rgba(5, 18, 28, 0.18);
-}
-
-.popcorn-cup {
-  left: 0;
-  width: 24px;
-  height: 30px;
-  background:
-    radial-gradient(circle at 7px 0, #fff8cf 0 5px, transparent 6px),
-    radial-gradient(circle at 17px 1px, #fff8cf 0 5px, transparent 6px),
-    repeating-linear-gradient(90deg, #fff7ea 0 6px, #d94c45 6px 11px);
-}
-
-.cola-cup {
-  left: 132px;
-  width: 20px;
-  height: 34px;
-  background: linear-gradient(180deg, #d94c45, #8a2f35);
-}
-
-.cola-cup::before {
-  content: "";
-  position: absolute;
-  left: 9px;
-  top: -13px;
-  width: 2px;
-  height: 16px;
-  background: rgba(255, 253, 247, 0.76);
-  transform: rotate(16deg);
 }
 
 .primary-button,
@@ -618,6 +465,11 @@ textarea:focus {
   display: block;
 }
 
+.detail-poster-frame img {
+  object-fit: contain;
+  background: #071324;
+}
+
 .poster-placeholder {
   position: absolute;
   inset: 0;
@@ -689,7 +541,7 @@ textarea:focus {
 
 .card-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   align-items: center;
   min-width: 0;
@@ -740,19 +592,6 @@ textarea:focus {
   -webkit-line-clamp: 2;
 }
 
-.card-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  opacity: 0.72;
-  transition: opacity 150ms ease;
-}
-
-.movie-card:hover .card-actions,
-.movie-card:focus-within .card-actions {
-  opacity: 1;
-}
-
 .muted-inline {
   color: #9ca3ad;
 }
@@ -773,17 +612,6 @@ textarea:focus {
 
 .danger-button {
   background: #f6e9df;
-  color: var(--warn);
-}
-
-.card-actions .secondary-button {
-  min-height: 38px;
-  background: transparent;
-  color: #52717b;
-  box-shadow: none;
-}
-
-.card-actions .danger-button {
   color: var(--warn);
 }
 
@@ -1052,12 +880,7 @@ small {
   }
 
   .topbar::after {
-    right: -72px;
-    bottom: -58px;
-    display: block;
-    width: 220px;
-    height: 120px;
-    opacity: 0.45;
+    opacity: 0.62;
   }
 
   h1 {
@@ -1073,8 +896,8 @@ small {
   }
 
   .topbar {
+    grid-template-columns: 1fr;
     align-items: stretch;
-    flex-direction: column;
   }
 
   .topbar {
@@ -1082,16 +905,7 @@ small {
     gap: 14px;
     margin-bottom: 18px;
     padding: 18px;
-  }
-
-  .night-illustration {
-    right: 12px;
-    bottom: 8px;
-    width: 118px;
-    height: 70px;
-    opacity: 0.55;
-    transform: scale(0.72);
-    transform-origin: right bottom;
+    background-position: 64% center;
   }
 
   .top-actions,
@@ -1241,15 +1055,6 @@ small {
     grid-template-columns: 1fr;
     gap: 8px;
     align-items: start;
-  }
-
-  .card-actions {
-    justify-content: flex-start;
-  }
-
-  .card-actions .secondary-button {
-    min-height: 34px;
-    padding: 0 8px;
   }
 
   .pagination {
