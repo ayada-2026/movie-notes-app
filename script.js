@@ -3,12 +3,9 @@ const SUPABASE_URL = "https://zjolzipsoqsczilhgqwq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KYwwO9ZHOAg4T45dzCAXsg_fJbShoXd";
 const STORAGE_BUCKET = "movie-posters";
 const MAX_POSTER_FILE_SIZE = 5 * 1024 * 1024;
-const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24;
-const SIGNED_URL_REFRESH_BUFFER_MS = 5 * 60 * 1000;
 const MOVIES_PER_PAGE = 20;
 const MOVIE_CACHE_KEY = "cinemaNote.cachedMovies.v1";
 const LOGIN_HINT_KEY = "cinemaNote.hasSignedIn.v1";
-const POSTER_URL_CACHE_KEY = "cinemaNote.posterUrls.v1";
 
 const isVercelPreviewHost =
   location.hostname.endsWith(".vercel.app") && location.hostname !== CANONICAL_HOST;
@@ -86,10 +83,6 @@ let isLoadingMovies = false;
 let hasRenderedCachedMovies = false;
 let selectedDetailMovieId = "";
 let currentPage = 1;
-let lastPosterRefreshAt = 0;
-let posterHydrationRun = 0;
-
-const posterUrlCache = new Map();
 
 function normalizeText(value) {
   return value.trim().replace(/\s+/g, " ");
@@ -176,75 +169,7 @@ function isStoragePoster(value) {
   return Boolean(value) && !isExternalPoster(value);
 }
 
-function getStoredPosterUrlCache() {
-  try {
-    const cachedValue = localStorage.getItem(POSTER_URL_CACHE_KEY);
-    if (!cachedValue) {
-      return {};
-    }
-
-    const parsedCache = JSON.parse(cachedValue);
-    return parsedCache && typeof parsedCache === "object" && !Array.isArray(parsedCache)
-      ? parsedCache
-      : {};
-  } catch {
-    return {};
-  }
-}
-
-function storePosterUrlCacheEntry(poster, cacheEntry) {
-  try {
-    const storedCache = getStoredPosterUrlCache();
-    storedCache[poster] = cacheEntry;
-    localStorage.setItem(POSTER_URL_CACHE_KEY, JSON.stringify(storedCache));
-  } catch {
-    // Signed URL cache is optional; expired URLs can always be regenerated.
-  }
-}
-
-function removeStoredPosterUrlCacheEntry(poster) {
-  try {
-    const storedCache = getStoredPosterUrlCache();
-    delete storedCache[poster];
-    localStorage.setItem(POSTER_URL_CACHE_KEY, JSON.stringify(storedCache));
-  } catch {
-    // Ignore cache cleanup failures.
-  }
-}
-
-function getStoredPosterUrl(poster) {
-  const cached = getStoredPosterUrlCache()[poster];
-
-  if (!cached?.url || !cached?.expiresAt) {
-    return "";
-  }
-
-  if (cached.expiresAt <= Date.now() + SIGNED_URL_REFRESH_BUFFER_MS) {
-    removeStoredPosterUrlCacheEntry(poster);
-    return "";
-  }
-
-  posterUrlCache.set(poster, cached);
-  return cached.url;
-}
-
-function getCachedPosterUrl(poster) {
-  const cached = posterUrlCache.get(poster);
-
-  if (!cached) {
-    return getStoredPosterUrl(poster);
-  }
-
-  if (cached.expiresAt <= Date.now() + SIGNED_URL_REFRESH_BUFFER_MS) {
-    posterUrlCache.delete(poster);
-    removeStoredPosterUrlCacheEntry(poster);
-    return "";
-  }
-
-  return cached.url;
-}
-
-async function resolvePosterUrl(poster, options = {}) {
+function resolvePosterUrl(poster) {
   if (!poster) {
     return "";
   }
@@ -253,39 +178,15 @@ async function resolvePosterUrl(poster, options = {}) {
     return poster;
   }
 
-  if (!options.forceRefresh) {
-    const cachedUrl = getCachedPosterUrl(poster);
-    if (cachedUrl) {
-      return cachedUrl;
-    }
-  }
-
-  const { data, error } = await supabaseClient.storage
-    .from(STORAGE_BUCKET)
-    .createSignedUrl(poster, SIGNED_URL_TTL_SECONDS);
-
-  if (error) {
-    return "";
-  }
-
-  const cacheEntry = {
-    url: data.signedUrl,
-    expiresAt: Date.now() + SIGNED_URL_TTL_SECONDS * 1000,
-  };
-
-  posterUrlCache.set(poster, cacheEntry);
-  storePosterUrlCacheEntry(poster, cacheEntry);
-
-  return data.signedUrl;
+  const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(poster);
+  return data.publicUrl || "";
 }
 
-async function hydratePosterUrls(items, options = {}) {
-  return Promise.all(
-    items.map(async (movie) => ({
-      ...movie,
-      posterUrl: await resolvePosterUrl(movie.poster, options),
-    })),
-  );
+function hydratePosterUrls(items) {
+  return items.map((movie) => ({
+    ...movie,
+    posterUrl: resolvePosterUrl(movie.poster),
+  }));
 }
 
 function movieToDbPayload(posterValue) {
@@ -298,10 +199,10 @@ function movieToDbPayload(posterValue) {
   };
 }
 
-function applyCachedPosterUrl(movie) {
+function applyPosterUrl(movie) {
   return {
     ...movie,
-    posterUrl: isExternalPoster(movie.poster) ? movie.poster : getCachedPosterUrl(movie.poster),
+    posterUrl: resolvePosterUrl(movie.poster),
   };
 }
 
@@ -336,7 +237,7 @@ function getCachedMovies() {
       return [];
     }
 
-    return parsedMovies.map(applyCachedPosterUrl);
+    return parsedMovies.map(applyPosterUrl);
   } catch {
     return [];
   }
@@ -356,12 +257,10 @@ function clearCachedSessionState() {
   try {
     localStorage.removeItem(MOVIE_CACHE_KEY);
     localStorage.removeItem(LOGIN_HINT_KEY);
-    localStorage.removeItem(POSTER_URL_CACHE_KEY);
   } catch {
     // Ignore storage failures during sign-out cleanup.
   }
 
-  posterUrlCache.clear();
   hasRenderedCachedMovies = false;
 }
 
@@ -601,33 +500,29 @@ function updatePosterFrame(frame, movie, posterUrl) {
   placeholder?.classList.add("is-hidden");
 }
 
-async function hydrateVisiblePosterUrls(options = {}) {
+function hydrateVisiblePosterUrls() {
   const visibleMovies = getPageItems(getVisibleMovies()).filter((movie) =>
-    isStoragePoster(movie.poster),
+    Boolean(movie.poster),
   );
 
   if (visibleMovies.length === 0) {
     return;
   }
 
-  const runId = (posterHydrationRun += 1);
+  visibleMovies.forEach((movie) => {
+    const posterUrl = resolvePosterUrl(movie.poster);
 
-  await Promise.all(
-    visibleMovies.map(async (movie) => {
-      const posterUrl = await resolvePosterUrl(movie.poster, options);
+    if (!posterUrl) {
+      return;
+    }
 
-      if (!posterUrl || runId !== posterHydrationRun) {
-        return;
-      }
+    setMoviePosterUrl(movie.id, posterUrl);
 
-      setMoviePosterUrl(movie.id, posterUrl);
-
-      const frame = elements.movieGrid.querySelector(
-        `.poster-frame[data-movie-id="${movie.id}"]`,
-      );
-      updatePosterFrame(frame, movie, posterUrl);
-    }),
-  );
+    const frame = elements.movieGrid.querySelector(
+      `.poster-frame[data-movie-id="${movie.id}"]`,
+    );
+    updatePosterFrame(frame, movie, posterUrl);
+  });
 }
 
 async function loadMoviesFromDb() {
@@ -652,7 +547,7 @@ async function loadMoviesFromDb() {
     return;
   }
 
-  const serverMovies = data.map(mapMovieFromDb).map(applyCachedPosterUrl);
+  const serverMovies = data.map(mapMovieFromDb).map(applyPosterUrl);
   const shouldRenderServerMovies =
     isLoadingMovies || !areMovieListsEquivalent(movies, serverMovies);
   movies = serverMovies;
@@ -725,15 +620,12 @@ function openDetail(movie) {
   elements.detailPoster.innerHTML = renderPosterMarkup(movie, "poster-frame detail-poster-frame");
   elements.detailModal.classList.remove("is-hidden");
 
-  if (isStoragePoster(movie.poster) && !movie.posterUrl) {
-    refreshMoviePoster(movie.id).then((updatedMovie) => {
-      if (!updatedMovie?.posterUrl || selectedDetailMovieId !== movie.id) {
-        return;
-      }
-
+  if (movie.poster && !movie.posterUrl) {
+    const updatedMovie = refreshMoviePoster(movie.id);
+    if (updatedMovie?.posterUrl && selectedDetailMovieId === movie.id) {
       const frame = elements.detailPoster.querySelector(".detail-poster-frame");
       updatePosterFrame(frame, updatedMovie, updatedMovie.posterUrl);
-    });
+    }
   }
 }
 
@@ -742,34 +634,28 @@ function closeDetail() {
   elements.detailModal.classList.add("is-hidden");
 }
 
-async function refreshMoviePoster(movieId, options = {}) {
+function refreshMoviePoster(movieId) {
   const movie = movies.find((item) => item.id === movieId);
 
-  if (!movie || !isStoragePoster(movie.poster)) {
+  if (!movie || !movie.poster) {
     return null;
   }
 
-  const posterUrl = await resolvePosterUrl(movie.poster, options);
+  const posterUrl = resolvePosterUrl(movie.poster);
   const updatedMovie = { ...movie, posterUrl };
   movies = movies.map((item) => (item.id === movieId ? updatedMovie : item));
   return updatedMovie;
 }
 
-async function refreshVisiblePosterUrls(options = {}) {
-  if (!session?.user || movies.length === 0) {
+function refreshVisiblePosterUrls() {
+  if (movies.length === 0) {
     return;
   }
 
-  if (!options.forceRefresh && Date.now() - lastPosterRefreshAt < 30 * 1000) {
-    return;
-  }
-
-  lastPosterRefreshAt = Date.now();
-
-  await hydrateVisiblePosterUrls(options);
+  hydrateVisiblePosterUrls();
 
   if (selectedDetailMovieId && !elements.detailModal.classList.contains("is-hidden")) {
-    const detailMovie = await refreshMoviePoster(selectedDetailMovieId, options);
+    const detailMovie = refreshMoviePoster(selectedDetailMovieId);
     if (detailMovie?.posterUrl) {
       elements.detailPoster.innerHTML = renderPosterMarkup(
         detailMovie,
@@ -797,10 +683,7 @@ async function handlePosterImageError(event) {
   }
 
   image.dataset.retryingPoster = "true";
-  posterUrlCache.delete(posterPath);
-  removeStoredPosterUrlCacheEntry(posterPath);
-
-  const updatedMovie = await refreshMoviePoster(movieId, { forceRefresh: true });
+  const updatedMovie = refreshMoviePoster(movieId);
   if (!updatedMovie?.posterUrl) {
     return;
   }
@@ -904,8 +787,6 @@ async function uploadPosterFile(file) {
     throw error;
   }
 
-  posterUrlCache.delete(path);
-  removeStoredPosterUrlCacheEntry(path);
   return path;
 }
 
@@ -981,15 +862,13 @@ async function handleSubmit(event) {
   if (error) {
     if (isStoragePoster(posterValue) && posterValue !== previousMovie?.poster) {
       await supabaseClient.storage.from(STORAGE_BUCKET).remove([posterValue]);
-      posterUrlCache.delete(posterValue);
-      removeStoredPosterUrlCacheEntry(posterValue);
     }
 
     setFormError("저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
     return;
   }
 
-  const [nextMovie] = await hydratePosterUrls([mapMovieFromDb(data)]);
+  const [nextMovie] = hydratePosterUrls([mapMovieFromDb(data)]);
 
   if (
     previousMovie &&
@@ -997,8 +876,6 @@ async function handleSubmit(event) {
     previousMovie.poster !== nextMovie.poster
   ) {
     await supabaseClient.storage.from(STORAGE_BUCKET).remove([previousMovie.poster]);
-    posterUrlCache.delete(previousMovie.poster);
-    removeStoredPosterUrlCacheEntry(previousMovie.poster);
   }
 
   if (id) {
@@ -1027,8 +904,6 @@ async function deleteMovie(movie) {
 
   if (isStoragePoster(movie.poster)) {
     await supabaseClient.storage.from(STORAGE_BUCKET).remove([movie.poster]);
-    posterUrlCache.delete(movie.poster);
-    removeStoredPosterUrlCacheEntry(movie.poster);
   }
 
   movies = movies.filter((item) => item.id !== movie.id);
