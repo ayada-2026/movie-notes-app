@@ -782,35 +782,73 @@ textarea:focus {
 
 .detail-header {
   overflow: hidden;
-  align-items: center;
+  align-items: flex-start;
   background:
-    radial-gradient(circle at 86% 12%, rgba(111, 183, 200, 0.22), transparent 30%),
-    linear-gradient(135deg, rgba(234, 245, 247, 0.96), rgba(255, 253, 247, 0.94) 62%);
+    radial-gradient(circle at 82% 18%, rgba(111, 183, 200, 0.22), transparent 28%),
+    linear-gradient(135deg, rgba(234, 245, 247, 0.98), rgba(255, 253, 247, 0.95) 64%);
   border-bottom-color: rgba(111, 183, 200, 0.22);
 }
 
-.detail-header > div {
+.detail-heading {
   position: relative;
   z-index: 2;
+  display: grid;
+  gap: 8px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .detail-header .eyebrow {
   color: var(--primary);
 }
 
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
 .detail-header h2 {
+  min-width: 0;
   color: #123142;
 }
 
-.detail-summer-character {
-  position: relative;
-  z-index: 1;
-  width: clamp(68px, 12vw, 104px);
+.detail-year-pill {
   flex: 0 0 auto;
-  align-self: end;
-  margin: -16px 8px -12px auto;
-  filter: drop-shadow(0 10px 18px rgba(14, 90, 102, 0.14));
+  min-height: 28px;
+  padding: 0 11px;
+  background: #0e6f77;
+  color: #fff;
+  font-size: 0.82rem;
+}
+
+.detail-date-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 34px;
+  padding: 4px 8px 4px 12px;
+  border: 1px solid rgba(111, 183, 200, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.68);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.detail-date-label {
+  color: var(--primary);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.detail-summer-character {
+  width: 42px;
+  flex: 0 0 auto;
+  margin: -12px -4px -10px 2px;
+  filter: drop-shadow(0 8px 14px rgba(14, 90, 102, 0.12));
   pointer-events: none;
 }
 
@@ -887,9 +925,10 @@ small {
 
 .detail-body {
   display: grid;
-  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
-  gap: 26px;
+  grid-template-columns: minmax(210px, 290px) minmax(0, 1fr);
+  gap: 28px;
   padding: 24px;
+  align-items: start;
 }
 
 .detail-poster-frame {
@@ -904,12 +943,7 @@ small {
 .detail-content {
   display: grid;
   align-content: start;
-  gap: 18px;
   min-width: 0;
-}
-
-.detail-meta {
-  font-size: 0.95rem;
 }
 
 .detail-review {
@@ -919,8 +953,7 @@ small {
   line-height: 1.86;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  padding-top: 14px;
-  border-top: 1px solid rgba(14, 90, 102, 0.14);
+  padding: 4px 0 0;
 }
 
 .detail-actions {
@@ -1160,13 +1193,36 @@ small {
     padding: 18px 16px 12px;
   }
 
+  .detail-heading {
+    gap: 7px;
+  }
+
+  .detail-title-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
   .detail-header h2 {
     font-size: 1.24rem;
   }
 
+  .detail-year-pill {
+    min-height: 26px;
+    padding-inline: 10px;
+    font-size: 0.78rem;
+  }
+
+  .detail-date-row {
+    gap: 6px;
+    min-height: 32px;
+    padding: 4px 6px 4px 10px;
+    font-size: 0.82rem;
+  }
+
   .detail-summer-character {
-    width: 58px;
-    margin: -12px 2px -8px auto;
+    width: 34px;
+    margin: -9px -3px -8px 0;
   }
 
   .detail-poster-frame {

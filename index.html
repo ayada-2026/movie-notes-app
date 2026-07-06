@@ -211,16 +211,23 @@
         aria-labelledby="detailTitle"
       >
         <div class="modal-header detail-header">
-          <div>
+          <div class="detail-heading">
             <p class="eyebrow">Movie note</p>
-            <h2 id="detailTitle"></h2>
+            <div class="detail-title-row">
+              <h2 id="detailTitle"></h2>
+              <span class="meta-pill detail-year-pill" id="detailReleaseYear"></span>
+            </div>
+            <div class="detail-date-row">
+              <span class="detail-date-label">본 날짜</span>
+              <span id="detailWatchedDate"></span>
+              <img
+                class="detail-summer-character"
+                src="assets/images/summer-character.png"
+                alt=""
+                aria-hidden="true"
+              />
+            </div>
           </div>
-          <img
-            class="detail-summer-character"
-            src="assets/images/summer-character.png"
-            alt=""
-            aria-hidden="true"
-          />
           <button class="icon-button" id="closeDetailButton" type="button" aria-label="닫기">
             x
           </button>
@@ -229,10 +236,6 @@
         <div class="detail-body">
           <div class="detail-poster" id="detailPoster"></div>
           <div class="detail-content">
-            <div class="card-meta detail-meta">
-              <span class="meta-pill" id="detailReleaseYear"></span>
-              <span id="detailWatchedDate"></span>
-            </div>
             <p class="detail-review" id="detailReview"></p>
           </div>
         </div>
