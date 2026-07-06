@@ -531,7 +531,9 @@ async function loadMoviesFromDb() {
   }
 
   isLoadingMovies = !hasRenderedCachedMovies;
-  renderMovies();
+  if (isLoadingMovies) {
+    renderMovies();
+  }
   setStatus("");
 
   const { data, error } = await supabaseClient
