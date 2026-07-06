@@ -276,17 +276,9 @@ function renderMovies() {
 
   const pageCount = getPageCount(visibleMovies.length);
   const pageMovies = getPageItems(visibleMovies);
-  const firstVisibleNumber =
-    visibleMovies.length === 0 ? 0 : (currentPage - 1) * MOVIES_PER_PAGE + 1;
-  const lastVisibleNumber = Math.min(currentPage * MOVIES_PER_PAGE, visibleMovies.length);
-  const rangeText =
-    visibleMovies.length > MOVIES_PER_PAGE
-      ? ` · ${firstVisibleNumber}-${lastVisibleNumber} 표시`
-      : "";
-
   elements.resultSummary.textContent = hasSearch
-    ? `${visibleMovies.length}개의 검색 결과${rangeText}`
-    : `${movies.length}개의 기록${rangeText}`;
+    ? `${visibleMovies.length}편 검색됨`
+    : `${movies.length}편의 기록`;
   elements.clearSearchButton.disabled = !hasSearch;
 
   elements.movieGrid.innerHTML = pageMovies.map(renderMovieCard).join("");
