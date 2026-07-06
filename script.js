@@ -81,6 +81,8 @@ let session = null;
 let isSaving = false;
 let isLoadingMovies = false;
 let hasRenderedCachedMovies = false;
+let loadedMoviesUserId = "";
+let loadingMoviesUserId = "";
 let selectedDetailMovieId = "";
 let currentPage = 1;
 
@@ -319,6 +321,8 @@ function renderAuthState() {
   elements.accountChip.classList.toggle("is-hidden", !isSignedIn);
   if (!isSignedIn) {
     isLoadingMovies = false;
+    loadedMoviesUserId = "";
+    loadingMoviesUserId = "";
     clearCachedSessionState();
     movies = [];
     renderMovies();
@@ -530,6 +534,12 @@ async function loadMoviesFromDb() {
     return;
   }
 
+  const userId = session.user.id;
+  if (loadingMoviesUserId === userId || loadedMoviesUserId === userId) {
+    return;
+  }
+
+  loadingMoviesUserId = userId;
   isLoadingMovies = !hasRenderedCachedMovies;
   if (isLoadingMovies) {
     renderMovies();
@@ -543,6 +553,7 @@ async function loadMoviesFromDb() {
     .order("created_at", { ascending: false });
 
   if (error) {
+    loadingMoviesUserId = "";
     isLoadingMovies = false;
     renderMovies();
     setStatus("목록을 불러오지 못했습니다");
@@ -555,6 +566,8 @@ async function loadMoviesFromDb() {
   movies = serverMovies;
   storeCachedMovies(movies);
   hasRenderedCachedMovies = false;
+  loadedMoviesUserId = userId;
+  loadingMoviesUserId = "";
   isLoadingMovies = false;
   if (shouldRenderServerMovies) {
     renderMovies();
