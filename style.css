@@ -825,9 +825,8 @@ textarea:focus {
 .detail-date-row {
   display: inline-flex;
   align-items: center;
-  gap: 22px;
-  width: min(100%, 320px);
-  min-height: 42px;
+  width: fit-content;
+  min-height: 30px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -842,10 +841,13 @@ textarea:focus {
 }
 
 .detail-summer-character {
-  width: 68px;
-  flex: 0 0 auto;
-  margin: -22px 0 -18px auto;
-  filter: drop-shadow(0 8px 14px rgba(14, 90, 102, 0.12));
+  position: absolute;
+  right: 78px;
+  bottom: 6px;
+  z-index: 1;
+  width: 58px;
+  opacity: 0.92;
+  filter: drop-shadow(0 8px 14px rgba(14, 90, 102, 0.1));
   pointer-events: none;
 }
 
@@ -1209,16 +1211,16 @@ small {
   }
 
   .detail-date-row {
-    gap: 18px;
-    width: min(100%, 250px);
-    min-height: 38px;
+    width: fit-content;
+    min-height: 28px;
     padding: 0;
     font-size: 0.9rem;
   }
 
   .detail-summer-character {
-    width: 54px;
-    margin: -18px 0 -14px auto;
+    right: 70px;
+    bottom: 8px;
+    width: 44px;
   }
 
   .detail-poster-frame {
