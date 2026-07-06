@@ -532,7 +532,7 @@ async function loadMoviesFromDb() {
 
   isLoadingMovies = !hasRenderedCachedMovies;
   renderMovies();
-  setStatus(hasRenderedCachedMovies ? "" : "불러오는 중");
+  setStatus("");
 
   const { data, error } = await supabaseClient
     .from("movie_notes")
@@ -1012,8 +1012,8 @@ function handleVisibilityChange() {
 }
 
 async function initializeApp() {
-  const renderedFromCache = renderCachedMoviesIfAvailable();
-  setStatus(renderedFromCache ? "" : "세션 확인 중");
+  renderCachedMoviesIfAvailable();
+  setStatus("");
 
   const {
     data: { session: currentSession },
