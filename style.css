@@ -237,40 +237,6 @@ h1 {
   background: var(--accent-strong);
 }
 
-.action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: -2px 0 12px;
-}
-
-.action-spacer {
-  min-width: 1px;
-}
-
-.action-bar .top-actions {
-  margin-left: auto;
-}
-
-.action-bar .primary-button {
-  min-height: 38px;
-  padding: 0 16px;
-  border-radius: 999px;
-  background: var(--primary);
-  color: #fff;
-  box-shadow: 0 10px 22px rgba(14, 90, 102, 0.18);
-}
-
-.action-bar .primary-button span {
-  font-size: 1.1rem;
-}
-
-.action-bar .ghost-button {
-  border-radius: 999px;
-  font-size: 0.86rem;
-}
-
 .toolbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
@@ -404,8 +370,38 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
+}
+
+.summary-actions .top-actions {
+  gap: 7px;
+}
+
+.summary-actions .primary-button {
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  box-shadow: 0 9px 18px rgba(14, 90, 102, 0.16);
+}
+
+.summary-actions .primary-button span {
+  font-size: 1rem;
+}
+
+.summary-actions .account-chip {
+  min-height: 34px;
+}
+
+.summary-actions .account-chip .ghost-button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.54);
+  color: var(--muted);
+  font-size: 0.8rem;
+  box-shadow: none;
 }
 
 .status-text {
@@ -432,6 +428,18 @@ textarea:focus {
   color: #9ca3ad;
   cursor: default;
   transform: none;
+}
+
+#clearSearchButton {
+  min-height: 32px;
+  padding: 0 9px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+#clearSearchButton:disabled {
+  display: none;
 }
 
 .movie-grid {
@@ -932,36 +940,27 @@ small {
     max-width: 72%;
   }
 
-  .action-bar {
-    justify-content: flex-end;
-    margin: -4px 0 10px;
-  }
-
-  .action-spacer {
-    display: none;
-  }
-
   .top-actions {
     width: auto;
-    gap: 8px;
+    gap: 6px;
   }
 
   .account-chip {
-    min-height: 36px;
+    min-height: 32px;
   }
 
-  .account-chip .ghost-button,
-  .action-bar .primary-button {
-    min-height: 36px;
-    padding-inline: 13px;
+  .summary-actions .primary-button,
+  .summary-actions .account-chip .ghost-button {
+    min-height: 32px;
+    padding-inline: 10px;
   }
 
-  .action-bar .primary-button {
-    font-size: 0.9rem;
+  .summary-actions .primary-button {
+    font-size: 0.8rem;
   }
 
-  .action-bar .ghost-button {
-    font-size: 0.82rem;
+  .summary-actions .ghost-button {
+    font-size: 0.78rem;
   }
 
   .toolbar,
@@ -1010,15 +1009,16 @@ small {
   }
 
   .summary-row {
-    align-items: center;
+    align-items: flex-start;
     flex-direction: row;
     margin-bottom: 12px;
   }
 
   .summary-actions {
-    align-items: center;
+    align-items: flex-end;
     flex-direction: row;
     justify-content: flex-end;
+    gap: 6px;
   }
 
   #resultSummary {
@@ -1032,8 +1032,8 @@ small {
   }
 
   #clearSearchButton {
-    min-height: 36px;
-    padding: 0 6px;
+    min-height: 32px;
+    padding: 0 7px;
     white-space: nowrap;
   }
 
