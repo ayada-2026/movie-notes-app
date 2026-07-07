@@ -40,6 +40,8 @@ const elements = {
   detailDeleteButton: document.querySelector("#detailDeleteButton"),
   detailEditButton: document.querySelector("#detailEditButton"),
   detailModal: document.querySelector("#detailModal"),
+  detailInfoReleaseYear: document.querySelector("#detailInfoReleaseYear"),
+  detailInfoWatchedDate: document.querySelector("#detailInfoWatchedDate"),
   detailPoster: document.querySelector("#detailPoster"),
   detailReleaseYear: document.querySelector("#detailReleaseYear"),
   detailReview: document.querySelector("#detailReview"),
@@ -631,6 +633,8 @@ function openDetail(movie) {
   elements.detailTitle.textContent = movie.title;
   elements.detailReleaseYear.textContent = movie.releaseYear;
   elements.detailWatchedDate.textContent = formatDate(movie.watchedDate);
+  elements.detailInfoReleaseYear.textContent = movie.releaseYear;
+  elements.detailInfoWatchedDate.textContent = formatDate(movie.watchedDate);
   elements.detailReview.textContent = movie.review || "감상이 비어 있습니다.";
   elements.detailPoster.innerHTML = renderPosterMarkup(movie, "poster-frame detail-poster-frame");
   elements.detailModal.classList.remove("is-hidden");

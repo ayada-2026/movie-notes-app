@@ -235,10 +235,26 @@
         </div>
 
         <div class="detail-body">
-          <div class="detail-poster" id="detailPoster"></div>
-          <div class="detail-content">
+          <section class="detail-info-card" aria-label="영화 기록 정보">
+            <div class="detail-poster" id="detailPoster"></div>
+            <div class="detail-record-info">
+              <p class="detail-section-label">기록 정보</p>
+              <div class="detail-info-row">
+                <span class="detail-info-icon detail-info-icon-year" aria-hidden="true"></span>
+                <span class="detail-info-label">출시년도</span>
+                <span class="detail-info-value" id="detailInfoReleaseYear"></span>
+              </div>
+              <div class="detail-info-row">
+                <span class="detail-info-icon detail-info-icon-date" aria-hidden="true"></span>
+                <span class="detail-info-label">본 날짜</span>
+                <span class="detail-info-value" id="detailInfoWatchedDate"></span>
+              </div>
+            </div>
+          </section>
+
+          <section class="detail-content" aria-label="감상 메모">
             <p class="detail-review" id="detailReview"></p>
-          </div>
+          </section>
         </div>
 
         <div class="modal-actions detail-actions">
