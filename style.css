@@ -344,7 +344,7 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   min-height: 38px;
   margin-bottom: 16px;
 }
@@ -377,6 +377,7 @@ textarea:focus {
   justify-content: flex-end;
   gap: 6px;
   flex-wrap: wrap;
+  margin-left: 10px;
 }
 
 .summary-actions .top-actions {
@@ -600,6 +601,10 @@ textarea:focus {
   line-height: 1.25;
   letter-spacing: 0;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .card-meta {
@@ -800,9 +805,9 @@ textarea:focus {
   overflow: hidden;
   align-items: flex-start;
   background:
-    radial-gradient(circle at 82% 28%, rgba(255, 253, 247, 0.9), transparent 20%),
-    radial-gradient(circle at 86% 40%, rgba(120, 210, 224, 0.36), transparent 32%),
-    linear-gradient(90deg, transparent 0%, rgba(214, 238, 241, 0.34) 58%, rgba(120, 210, 224, 0.18) 100%),
+    radial-gradient(circle at 82% 30%, rgba(255, 253, 247, 0.82), transparent 22%),
+    radial-gradient(circle at 86% 43%, rgba(120, 210, 224, 0.42), transparent 34%),
+    linear-gradient(90deg, transparent 0%, rgba(214, 238, 241, 0.38) 54%, rgba(120, 210, 224, 0.22) 100%),
     radial-gradient(circle at 14% 0%, rgba(214, 238, 241, 0.82), transparent 34%),
     linear-gradient(135deg, rgba(232, 249, 250, 0.98) 0%, rgba(250, 255, 251, 0.96) 54%, rgba(255, 250, 235, 0.92) 100%);
   border-bottom-color: rgba(111, 183, 200, 0.28);
@@ -890,8 +895,8 @@ textarea:focus {
   z-index: 4;
   width: 30px;
   min-height: 30px;
-  background: rgba(255, 253, 247, 0.48);
-  color: #123142;
+  background: rgba(255, 253, 247, 0.28);
+  color: rgba(18, 49, 66, 0.82);
   box-shadow: none;
   font-size: 0.78rem;
   backdrop-filter: blur(8px);
@@ -903,7 +908,7 @@ textarea:focus {
   width: min(132px, 78%);
   max-height: 132px;
   object-fit: contain;
-  margin: 8px 16px -10px 0;
+  margin: 16px 16px -18px 0;
   opacity: 0.98;
   filter: drop-shadow(0 12px 18px rgba(14, 90, 102, 0.14));
   pointer-events: none;
@@ -986,14 +991,14 @@ small {
 
 .detail-body {
   display: grid;
-  grid-template-columns: minmax(210px, 290px) minmax(0, 1fr);
+  grid-template-columns: minmax(190px, 260px) minmax(0, 1fr);
   gap: 28px;
   padding: 24px;
   align-items: start;
 }
 
 .detail-poster-frame {
-  width: min(100%, 280px);
+  width: min(100%, 246px);
   aspect-ratio: 0.72;
   justify-self: center;
   min-height: auto;
@@ -1148,7 +1153,7 @@ small {
   .summary-row {
     align-items: flex-start;
     flex-direction: row;
-    gap: 8px;
+    gap: 12px;
     margin-bottom: 12px;
   }
 
@@ -1156,7 +1161,8 @@ small {
     align-items: flex-end;
     flex-direction: row;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 8px;
+    margin-left: 6px;
   }
 
   #resultSummary {
@@ -1224,6 +1230,7 @@ small {
 
   .review-preview {
     font-size: 0.94rem;
+    -webkit-line-clamp: 2;
   }
 
   .card-body {
@@ -1303,11 +1310,11 @@ small {
   .detail-summer-character {
     width: min(100px, 82%);
     max-height: 104px;
-    margin: 12px 10px -8px 0;
+    margin: 18px 10px -14px 0;
   }
 
   .detail-poster-frame {
-    width: min(76vw, 280px);
+    width: min(68vw, 246px);
     min-height: auto;
   }
 
