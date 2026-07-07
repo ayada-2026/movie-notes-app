@@ -1437,16 +1437,16 @@ small {
     grid-template-columns: 1fr;
     justify-items: stretch;
     gap: 18px;
-    margin: -26px 16px 0;
+    margin: -18px 16px 0;
     padding: 0;
     border-radius: 0;
   }
 
   .detail-header {
-    min-height: 288px;
+    min-height: 246px;
     gap: 8px;
-    padding: 28px 18px 96px;
-    background-position: right center;
+    padding: 24px 18px 66px;
+    background-position: 72% center;
   }
 
   .detail-heading {
@@ -1581,7 +1581,7 @@ small {
 
   .detail-content {
     width: 100%;
-    padding: 22px 18px 34px;
+    padding: 22px 18px 58px;
     border-radius: 24px;
   }
 
@@ -1598,15 +1598,15 @@ small {
   }
 
   .detail-review::before {
-    left: -16px;
-    bottom: -20px;
-    transform: scale(0.72);
+    left: -10px;
+    bottom: -48px;
+    transform: scale(0.64);
   }
 
   .detail-review::after {
-    right: -18px;
-    bottom: -24px;
-    transform: scale(0.72);
+    right: -14px;
+    bottom: -54px;
+    transform: scale(0.66);
     transform-origin: right bottom;
   }
 
