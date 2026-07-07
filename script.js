@@ -196,7 +196,7 @@ function movieToDbPayload(posterValue) {
     title: normalizeText(elements.titleInput.value),
     release_year: Number(elements.releaseYearInput.value),
     watched_date: elements.watchedDateInput.value,
-    review: elements.reviewInput.value.trim(),
+    review: normalizeText(elements.reviewInput.value),
     poster: posterValue || null,
   };
 }
