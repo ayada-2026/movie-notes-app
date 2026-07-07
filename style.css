@@ -810,44 +810,18 @@ textarea:focus {
   align-items: flex-start;
   padding: 52px 54px 96px;
   background:
-    radial-gradient(circle at 5% 15%, rgba(255, 255, 255, 0.9) 0 22px, transparent 23px),
-    radial-gradient(circle at 12% 16%, rgba(255, 255, 255, 0.72) 0 32px, transparent 33px),
-    radial-gradient(circle at 78% 24%, rgba(255, 255, 255, 0.76) 0 48px, transparent 49px),
-    radial-gradient(circle at 88% 31%, rgba(255, 255, 255, 0.66) 0 36px, transparent 37px),
-    radial-gradient(ellipse at 58% 22%, rgba(255, 255, 255, 0.9) 0 14px, transparent 15px),
-    radial-gradient(ellipse at 68% 20%, rgba(255, 255, 255, 0.82) 0 12px, transparent 13px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0) 0 68%, rgba(103, 205, 221, 0.54) 69% 78%, rgba(255, 239, 198, 0.96) 79% 100%),
-    linear-gradient(135deg, #b4eef9 0%, #e7fbff 46%, #fff6de 100%);
+    linear-gradient(90deg, rgba(220, 251, 255, 0.58) 0%, rgba(220, 251, 255, 0.28) 42%, rgba(220, 251, 255, 0.04) 72%),
+    url("assets/images/detail-summer-header.png") center / cover no-repeat;
   border-bottom: 0;
   box-shadow: none;
 }
 
 .detail-header::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 58px;
-  height: 20px;
-  background:
-    radial-gradient(circle at 12% 70%, rgba(255, 255, 255, 0.82) 0 2px, transparent 3px),
-    radial-gradient(circle at 25% 62%, rgba(255, 255, 255, 0.7) 0 2px, transparent 3px),
-    radial-gradient(circle at 38% 74%, rgba(255, 255, 255, 0.72) 0 2px, transparent 3px),
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.62), transparent);
-  opacity: 0.86;
-  pointer-events: none;
+  content: none;
 }
 
 .detail-header::before {
-  content: "";
-  position: absolute;
-  inset: 34px 42px auto auto;
-  width: 128px;
-  height: 38px;
-  background:
-    radial-gradient(ellipse at 24% 50%, rgba(255, 255, 255, 0.88) 0 15%, transparent 16%),
-    radial-gradient(ellipse at 54% 48%, rgba(255, 255, 255, 0.82) 0 13%, transparent 14%),
-    radial-gradient(ellipse at 82% 52%, rgba(255, 255, 255, 0.78) 0 10%, transparent 11%);
-  opacity: 0.85;
-  pointer-events: none;
+  content: none;
 }
 
 .detail-heading {
@@ -934,21 +908,20 @@ textarea:focus {
 }
 
 .detail-illustration {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  place-items: end center;
-  align-self: stretch;
-  width: clamp(220px, 36%, 330px);
-  min-height: 228px;
-  margin: 8px -8px -86px 8px;
-  overflow: visible;
+  position: absolute;
+  z-index: 3;
+  top: 24px;
+  right: 26px;
+  width: 58px;
+  min-height: 58px;
+  margin: 0;
+  pointer-events: none;
 }
 
 .detail-header .icon-button {
   position: absolute;
-  top: -20px;
-  right: -22px;
+  top: 0;
+  right: 0;
   z-index: 4;
   width: 54px;
   min-height: 54px;
@@ -958,18 +931,11 @@ textarea:focus {
   box-shadow: 0 10px 20px rgba(12, 57, 82, 0.12);
   font-size: 1.1rem;
   backdrop-filter: blur(10px);
+  pointer-events: auto;
 }
 
 .detail-summer-character {
-  position: relative;
-  z-index: 2;
-  width: min(270px, 96%);
-  max-height: 270px;
-  object-fit: contain;
-  margin: 44px 18px -34px 0;
-  opacity: 0.98;
-  filter: drop-shadow(0 12px 18px rgba(14, 90, 102, 0.14));
-  pointer-events: none;
+  display: none;
 }
 
 .icon-button {
@@ -1180,9 +1146,7 @@ small {
   color: #279fa1;
   font-size: 1.08rem;
   font-weight: 900;
-  background:
-    radial-gradient(circle at 13px 15px, #83cfa7 0 7px, transparent 8px),
-    linear-gradient(135deg, transparent 0 17px, #83cfa7 18px 20px, transparent 21px);
+  background: url("assets/images/memo-leaf.png") left -6px top -8px / 38px auto no-repeat;
   background-repeat: no-repeat;
 }
 
@@ -1194,12 +1158,8 @@ small {
   width: 62px;
   height: 26px;
   transform: rotate(18deg);
-  border-radius: 5px;
-  background:
-    radial-gradient(circle at 12px 9px, rgba(255, 255, 255, 0.35) 0 3px, transparent 4px),
-    radial-gradient(circle at 35px 17px, rgba(255, 255, 255, 0.32) 0 3px, transparent 4px),
-    rgba(255, 185, 148, 0.72);
-  box-shadow: 0 4px 10px rgba(214, 144, 116, 0.16);
+  background: url("assets/images/memo-tape.png") center / contain no-repeat;
+  filter: drop-shadow(0 4px 8px rgba(214, 144, 116, 0.12));
 }
 
 .detail-review::before,
@@ -1214,11 +1174,8 @@ small {
   bottom: -26px;
   width: 62px;
   height: 48px;
-  background:
-    radial-gradient(circle at 18px 24px, transparent 0 8px, #ffb79a 9px 11px, transparent 12px),
-    radial-gradient(circle at 44px 30px, transparent 0 7px, #f6c6a6 8px 10px, transparent 11px),
-    radial-gradient(ellipse at 20px 28px, rgba(255, 151, 124, 0.7) 0 14px, transparent 15px);
-  opacity: 0.78;
+  background: url("assets/images/memo-shells.png") center / contain no-repeat;
+  opacity: 0.94;
 }
 
 .detail-review::after {
@@ -1226,11 +1183,8 @@ small {
   bottom: -28px;
   width: 86px;
   height: 64px;
-  background:
-    radial-gradient(ellipse at 46px 54px, rgba(240, 204, 140, 0.52) 0 30px, transparent 31px),
-    conic-gradient(from 0.65turn at 48px 20px, #8fd8ce 0 0.13turn, #f6fff8 0.13turn 0.25turn, #8fd8ce 0.25turn 0.38turn, transparent 0.38turn) 0 0 / 80px 48px no-repeat,
-    linear-gradient(105deg, transparent 0 49px, #a47d58 50px 53px, transparent 54px);
-  opacity: 0.82;
+  background: url("assets/images/memo-parasol.png") center / contain no-repeat;
+  opacity: 0.94;
 }
 
 .detail-review {
@@ -1541,18 +1495,19 @@ small {
 
   .detail-illustration {
     position: absolute;
-    right: 14px;
-    bottom: 48px;
-    width: 38%;
-    min-width: 126px;
-    min-height: 132px;
+    top: 18px;
+    right: 18px;
+    bottom: auto;
+    width: 46px;
+    min-width: 46px;
+    min-height: 46px;
     margin: 0;
     pointer-events: none;
   }
 
   .detail-header .icon-button {
-    top: -12px;
-    right: -8px;
+    top: 0;
+    right: 0;
     width: 42px;
     min-height: 42px;
     border-radius: 12px;
@@ -1560,9 +1515,7 @@ small {
   }
 
   .detail-summer-character {
-    width: min(150px, 100%);
-    max-height: 154px;
-    margin: 0;
+    display: none;
   }
 
   .detail-info-card {
