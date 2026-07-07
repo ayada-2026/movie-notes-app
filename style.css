@@ -1446,6 +1446,7 @@ small {
     min-height: 288px;
     gap: 8px;
     padding: 28px 18px 96px;
+    background-position: right center;
   }
 
   .detail-heading {
@@ -1519,14 +1520,14 @@ small {
   }
 
   .detail-info-card {
-    grid-template-columns: 104px minmax(0, 1fr);
-    gap: 16px;
-    padding: 18px;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
     border-radius: 24px;
   }
 
   .detail-poster-frame {
-    width: 104px;
+    width: 92px;
     min-height: auto;
     border-radius: 14px;
   }
@@ -1541,14 +1542,14 @@ small {
   }
 
   .detail-info-row {
-    grid-template-columns: 34px minmax(64px, auto) minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: 30px 54px minmax(86px, 1fr);
+    gap: 7px;
     min-height: 46px;
   }
 
   .detail-info-icon {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 10px;
   }
 
@@ -1570,7 +1571,12 @@ small {
 
   .detail-info-label,
   .detail-info-value {
-    font-size: 0.86rem;
+    font-size: 0.8rem;
+  }
+
+  .detail-info-value {
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .detail-content {
