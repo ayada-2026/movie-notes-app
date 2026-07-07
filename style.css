@@ -776,8 +776,10 @@ textarea:focus {
 .detail-modal {
   width: min(900px, 100%);
   background:
-    linear-gradient(180deg, rgba(214, 238, 241, 0.36), transparent 220px),
-    var(--paper);
+    radial-gradient(circle at 16% 92%, rgba(255, 183, 147, 0.24), transparent 9%),
+    radial-gradient(circle at 88% 90%, rgba(111, 183, 200, 0.22), transparent 13%),
+    linear-gradient(180deg, #dff7f8 0%, #effcf8 42%, #fffaf0 100%);
+  border-radius: 26px;
 }
 
 .modal-header {
@@ -802,25 +804,47 @@ textarea:focus {
 }
 
 .detail-header {
+  position: relative;
+  min-height: 268px;
   overflow: hidden;
   align-items: flex-start;
+  padding: 46px 48px 72px;
   background:
-    radial-gradient(circle at 82% 30%, rgba(255, 253, 247, 0.82), transparent 22%),
-    radial-gradient(circle at 86% 43%, rgba(120, 210, 224, 0.42), transparent 34%),
-    linear-gradient(90deg, transparent 0%, rgba(214, 238, 241, 0.38) 54%, rgba(120, 210, 224, 0.22) 100%),
-    radial-gradient(circle at 14% 0%, rgba(214, 238, 241, 0.82), transparent 34%),
-    linear-gradient(135deg, rgba(232, 249, 250, 0.98) 0%, rgba(250, 255, 251, 0.96) 54%, rgba(255, 250, 235, 0.92) 100%);
-  border-bottom-color: rgba(111, 183, 200, 0.28);
-  box-shadow: inset 0 -1px 0 rgba(14, 90, 102, 0.06);
+    radial-gradient(circle at 8% 18%, rgba(255, 255, 255, 0.9) 0 18px, transparent 19px),
+    radial-gradient(circle at 15% 16%, rgba(255, 255, 255, 0.72) 0 24px, transparent 25px),
+    radial-gradient(circle at 77% 22%, rgba(255, 255, 255, 0.7) 0 38px, transparent 39px),
+    radial-gradient(circle at 84% 26%, rgba(255, 255, 255, 0.66) 0 30px, transparent 31px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 0 72%, rgba(120, 210, 224, 0.48) 73% 81%, rgba(255, 238, 196, 0.92) 82% 100%),
+    linear-gradient(135deg, #bdf1fb 0%, #e8fbff 48%, #fff6df 100%);
+  border-bottom: 0;
+  box-shadow: none;
 }
 
 .detail-header::after {
   content: "";
   position: absolute;
-  inset: auto 0 0;
-  height: 5px;
-  background: linear-gradient(90deg, #79d3df, #d6eef1 48%, #d8b879);
-  opacity: 0.72;
+  inset: auto 0 34px;
+  height: 18px;
+  background:
+    radial-gradient(circle at 12% 70%, rgba(255, 255, 255, 0.82) 0 2px, transparent 3px),
+    radial-gradient(circle at 25% 62%, rgba(255, 255, 255, 0.7) 0 2px, transparent 3px),
+    radial-gradient(circle at 38% 74%, rgba(255, 255, 255, 0.72) 0 2px, transparent 3px),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.62), transparent);
+  opacity: 0.86;
+  pointer-events: none;
+}
+
+.detail-header::before {
+  content: "";
+  position: absolute;
+  inset: 28px 32px auto auto;
+  width: 128px;
+  height: 38px;
+  background:
+    radial-gradient(ellipse at 24% 50%, rgba(255, 255, 255, 0.88) 0 15%, transparent 16%),
+    radial-gradient(ellipse at 54% 48%, rgba(255, 255, 255, 0.82) 0 13%, transparent 14%),
+    radial-gradient(ellipse at 82% 52%, rgba(255, 255, 255, 0.78) 0 10%, transparent 11%);
+  opacity: 0.85;
   pointer-events: none;
 }
 
@@ -828,31 +852,37 @@ textarea:focus {
   position: relative;
   z-index: 2;
   display: grid;
-  gap: 8px;
+  gap: 18px;
   min-width: 0;
-  flex: 1 1 68%;
+  flex: 1 1 62%;
+  padding-top: 4px;
 }
 
 .detail-header .eyebrow {
-  color: #0b7886;
+  color: #259aa0;
+  font-size: 1rem;
+  letter-spacing: 0.16em;
 }
 
 .detail-title-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   min-width: 0;
 }
 
 .detail-header h2 {
   min-width: 0;
-  color: #102d3b;
+  color: #10364b;
+  font-size: clamp(2.1rem, 5vw, 3.9rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
 }
 
 .detail-year-pill {
   flex: 0 0 auto;
-  color: #078493;
-  font-size: 1rem;
+  color: #279fa1;
+  font-size: clamp(1.1rem, 2.3vw, 1.6rem);
   font-weight: 900;
   line-height: 1.2;
 }
@@ -860,19 +890,36 @@ textarea:focus {
 .detail-date-row {
   display: inline-flex;
   align-items: center;
+  gap: 14px;
   width: fit-content;
-  min-height: 30px;
+  min-height: 54px;
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: var(--muted);
-  font-size: 0.98rem;
+  font-size: 1.24rem;
   font-weight: 800;
 }
 
+.detail-date-row::before {
+  content: "";
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background:
+    linear-gradient(#279fa1, #279fa1) 50% 15px / 18px 3px no-repeat,
+    linear-gradient(#279fa1, #279fa1) 50% 23px / 18px 3px no-repeat,
+    linear-gradient(#279fa1, #279fa1) 14px 14px / 3px 18px no-repeat,
+    linear-gradient(#279fa1, #279fa1) 29px 14px / 3px 18px no-repeat,
+    rgba(255, 255, 255, 0.78);
+  box-shadow: 0 10px 22px rgba(61, 154, 166, 0.13);
+}
+
 .detail-date-row #detailWatchedDate {
-  color: #5c7178;
+  color: #657987;
   flex: 0 0 auto;
 }
 
@@ -882,33 +929,34 @@ textarea:focus {
   display: grid;
   place-items: end center;
   align-self: stretch;
-  width: clamp(150px, 28%, 220px);
-  min-height: 110px;
-  margin: -12px -10px -12px 8px;
+  width: clamp(190px, 34%, 320px);
+  min-height: 180px;
+  margin: -6px -8px -66px 8px;
   overflow: visible;
 }
 
 .detail-header .icon-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: -20px;
+  right: -22px;
   z-index: 4;
-  width: 30px;
-  min-height: 30px;
-  background: rgba(255, 253, 247, 0.28);
+  width: 54px;
+  min-height: 54px;
+  background: rgba(255, 255, 255, 0.68);
   color: rgba(18, 49, 66, 0.82);
-  box-shadow: none;
-  font-size: 0.78rem;
-  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(12, 57, 82, 0.12);
+  font-size: 1.1rem;
+  backdrop-filter: blur(10px);
 }
 
 .detail-summer-character {
   position: relative;
   z-index: 2;
-  width: min(132px, 78%);
-  max-height: 132px;
+  width: min(220px, 92%);
+  max-height: 220px;
   object-fit: contain;
-  margin: 16px 16px -18px 0;
+  margin: 34px 18px -28px 0;
   opacity: 0.98;
   filter: drop-shadow(0 12px 18px rgba(14, 90, 102, 0.14));
   pointer-events: none;
@@ -991,10 +1039,17 @@ small {
 
 .detail-body {
   display: grid;
-  grid-template-columns: minmax(190px, 260px) minmax(0, 1fr);
-  gap: 28px;
-  padding: 24px;
+  grid-template-columns: minmax(190px, 250px) minmax(0, 1fr);
+  gap: 34px;
+  margin: -38px 38px 0;
+  padding: 30px;
   align-items: start;
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 253, 247, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 32px;
+  box-shadow: 0 18px 46px rgba(56, 129, 131, 0.16);
 }
 
 .detail-poster-frame {
@@ -1002,28 +1057,52 @@ small {
   aspect-ratio: 0.72;
   justify-self: center;
   min-height: auto;
-  border: 1px solid rgba(14, 90, 102, 0.16);
-  box-shadow: 0 12px 26px rgba(14, 90, 102, 0.12);
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 16px 30px rgba(16, 54, 75, 0.16);
 }
 
 .detail-content {
   display: grid;
   align-content: start;
+  gap: 16px;
   min-width: 0;
+  padding: 18px 18px 20px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 41px, rgba(216, 184, 121, 0.22) 42px 43px),
+    rgba(255, 253, 247, 0.88);
+  border-radius: 24px;
+  box-shadow: inset 0 0 0 1px rgba(111, 183, 200, 0.12);
+}
+
+.detail-content::before {
+  content: "나의 한줄 메모";
+  display: block;
+  width: 100%;
+  padding: 0 0 12px 42px;
+  border-bottom: 2px solid rgba(111, 183, 200, 0.5);
+  color: #279fa1;
+  font-size: 1.08rem;
+  font-weight: 900;
+  background:
+    radial-gradient(circle at 13px 15px, #83cfa7 0 7px, transparent 8px),
+    linear-gradient(135deg, transparent 0 17px, #83cfa7 18px 20px, transparent 21px);
+  background-repeat: no-repeat;
 }
 
 .detail-review {
   margin: 0;
   color: #2f4352;
-  font-size: 1.02rem;
-  line-height: 1.86;
+  font-size: 1.08rem;
+  line-height: 1.98;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  padding: 4px 0 0;
+  padding: 2px 0 0;
 }
 
 .detail-actions {
-  padding: 0 22px 22px;
+  justify-content: center;
+  padding: 22px 38px 34px;
 }
 
 .is-hidden {
@@ -1259,67 +1338,92 @@ small {
   .detail-body {
     grid-template-columns: 1fr;
     justify-items: center;
+    gap: 22px;
+    margin: -28px 16px 0;
     padding: 18px;
+    border-radius: 24px;
   }
 
   .detail-header {
-    gap: 10px;
-    padding: 18px 16px 12px;
+    min-height: 252px;
+    gap: 8px;
+    padding: 28px 18px 70px;
   }
 
   .detail-heading {
-    gap: 7px;
-    flex-basis: 66%;
+    gap: 12px;
+    flex-basis: 62%;
+    padding-top: 0;
   }
 
   .detail-title-row {
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 7px;
+    gap: 8px;
   }
 
   .detail-header h2 {
-    font-size: 1.24rem;
+    font-size: 1.64rem;
   }
 
   .detail-year-pill {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .detail-date-row {
     width: fit-content;
-    min-height: 28px;
+    min-height: 36px;
     padding: 0;
-    font-size: 0.9rem;
+    gap: 9px;
+    font-size: 0.98rem;
+  }
+
+  .detail-date-row::before {
+    width: 32px;
+    height: 32px;
+    font-size: 0.74rem;
   }
 
   .detail-illustration {
-    width: 34%;
-    min-width: 112px;
-    min-height: 96px;
-    margin: -10px -8px -10px 4px;
+    width: 38%;
+    min-width: 122px;
+    min-height: 142px;
+    margin: 2px -8px -58px 4px;
   }
 
   .detail-header .icon-button {
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    min-height: 28px;
+    top: -16px;
+    right: -10px;
+    width: 42px;
+    min-height: 42px;
+    border-radius: 12px;
   }
 
   .detail-summer-character {
-    width: min(100px, 82%);
-    max-height: 104px;
-    margin: 18px 10px -14px 0;
+    width: min(140px, 96%);
+    max-height: 148px;
+    margin: 40px 6px -24px 0;
   }
 
   .detail-poster-frame {
-    width: min(68vw, 246px);
+    width: min(58vw, 218px);
     min-height: auto;
   }
 
   .detail-content {
     width: 100%;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .detail-content::before {
+    padding-left: 36px;
+    font-size: 0.98rem;
+  }
+
+  .detail-review {
+    font-size: 0.98rem;
+    line-height: 1.9;
   }
 
   .modal-backdrop {
@@ -1332,7 +1436,7 @@ small {
     width: 100%;
     max-width: 100%;
     max-height: 94vh;
-    border-radius: 10px;
+    border-radius: 18px;
   }
 
   .modal-header {
