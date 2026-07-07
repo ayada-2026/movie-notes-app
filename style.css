@@ -1443,16 +1443,16 @@ small {
   }
 
   .detail-header {
-    min-height: 246px;
+    min-height: 214px;
     gap: 8px;
-    padding: 24px 18px 66px;
-    background-position: 72% center;
+    padding: 24px 18px 46px;
+    background-position: 68% center;
   }
 
   .detail-heading {
-    gap: 12px;
-    flex-basis: 60%;
-    max-width: 64%;
+    gap: 9px;
+    flex-basis: 58%;
+    max-width: 60%;
     padding-top: 0;
   }
 
@@ -1463,45 +1463,26 @@ small {
   }
 
   .detail-header h2 {
-    font-size: 1.42rem;
+    font-size: 1.34rem;
     line-height: 1.16;
   }
 
   .detail-year-pill {
-    font-size: 1rem;
+    display: none;
   }
 
   .detail-date-row {
-    width: fit-content;
-    min-height: 36px;
-    padding: 0;
-    gap: 9px;
-    font-size: 0.98rem;
-  }
-
-  .detail-date-row::before {
-    width: 32px;
-    height: 32px;
-    font-size: 0.74rem;
-  }
-
-  .detail-date-row::after {
-    left: 9px;
-    width: 14px;
-    height: 14px;
-    border-width: 2px;
-    border-top-width: 4px;
-    border-radius: 3px;
+    display: none;
   }
 
   .detail-illustration {
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: 16px;
+    right: 16px;
     bottom: auto;
-    width: 46px;
-    min-width: 46px;
-    min-height: 46px;
+    width: 38px;
+    min-width: 38px;
+    min-height: 38px;
     margin: 0;
     pointer-events: none;
   }
@@ -1509,9 +1490,10 @@ small {
   .detail-header .icon-button {
     top: 0;
     right: 0;
-    width: 42px;
-    min-height: 42px;
-    border-radius: 12px;
+    width: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+    font-size: 0.9rem;
     pointer-events: auto;
   }
 
