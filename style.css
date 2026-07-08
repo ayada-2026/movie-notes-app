@@ -1320,6 +1320,62 @@ small {
     font-size: 16px;
   }
 
+  .modal:not(.detail-modal) .modal-header {
+    padding: 16px 16px 10px;
+    align-items: center;
+  }
+
+  .modal:not(.detail-modal) .modal-header h2 {
+    font-size: 1.28rem;
+  }
+
+  .modal:not(.detail-modal) .icon-button {
+    width: 38px;
+    min-height: 38px;
+    border-radius: 10px;
+  }
+
+  .modal:not(.detail-modal) form {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .modal:not(.detail-modal) label {
+    gap: 6px;
+    font-size: 0.8rem;
+  }
+
+  .modal:not(.detail-modal) input,
+  .modal:not(.detail-modal) select {
+    height: 42px;
+    padding: 0 12px;
+  }
+
+  #watchedDateInput {
+    text-align: left;
+  }
+
+  .poster-field {
+    gap: 8px;
+  }
+
+  .poster-field input[type="file"] {
+    min-height: 42px;
+    padding: 8px 12px;
+  }
+
+  .poster-field .help-text {
+    display: none;
+  }
+
+  .checkbox-field {
+    min-height: 34px;
+  }
+
+  textarea {
+    min-height: 128px;
+  }
+
   #searchInput {
     padding-left: 38px;
     background-position:

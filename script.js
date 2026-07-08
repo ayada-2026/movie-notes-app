@@ -93,6 +93,26 @@ function normalizeText(value) {
   return value.trim().replace(/\s+/g, " ");
 }
 
+function normalizeDateInput(value) {
+  const compact = value.trim().replace(/[.\s/]/g, "-");
+  const digits = value.replace(/\D/g, "");
+
+  if (/^\d{8}$/.test(digits)) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+  }
+
+  return compact.replace(/-(\d)(?=-|$)/g, "-0$1");
+}
+
+function isValidIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
 function getVisibleMovies() {
   const query = elements.searchInput.value.trim().toLocaleLowerCase("ko-KR");
   const [field, direction] = elements.sortSelect.value.split("-");
@@ -198,7 +218,7 @@ function movieToDbPayload(posterValue) {
   return {
     title: normalizeText(elements.titleInput.value),
     release_year: Number(elements.releaseYearInput.value),
-    watched_date: elements.watchedDateInput.value,
+    watched_date: normalizeDateInput(elements.watchedDateInput.value),
     review: normalizeText(elements.reviewInput.value),
     poster: posterValue || null,
   };
@@ -730,7 +750,7 @@ function handlePosterImageLoad(event) {
 function validateForm() {
   const title = normalizeText(elements.titleInput.value);
   const releaseYear = Number(elements.releaseYearInput.value);
-  const watchedDate = elements.watchedDateInput.value;
+  const watchedDate = normalizeDateInput(elements.watchedDateInput.value);
   const posterFile = elements.posterFileInput.files[0];
   const posterUrl = elements.posterInput.value.trim();
 
@@ -740,6 +760,10 @@ function validateForm() {
 
   if (releaseYear < 1888 || releaseYear > 2100) {
     return "출시년도는 1888년부터 2100년 사이로 입력해주세요.";
+  }
+
+  if (!isValidIsoDate(watchedDate)) {
+    return "본 날짜는 2025-10-02 형식으로 입력해주세요.";
   }
 
   if (posterUrl && !isExternalPoster(posterUrl)) {
@@ -1032,6 +1056,13 @@ function handleVisibilityChange() {
   }
 }
 
+function handleWatchedDateBlur() {
+  const normalizedDate = normalizeDateInput(elements.watchedDateInput.value);
+  if (isValidIsoDate(normalizedDate)) {
+    elements.watchedDateInput.value = normalizedDate;
+  }
+}
+
 async function initializeApp() {
   renderCachedMoviesIfAvailable();
   setStatus("");
@@ -1072,6 +1103,7 @@ elements.emptyAddButton.addEventListener("click", () => openModal());
 elements.closeModalButton.addEventListener("click", closeModal);
 elements.cancelButton.addEventListener("click", closeModal);
 elements.form.addEventListener("submit", handleSubmit);
+elements.watchedDateInput.addEventListener("blur", handleWatchedDateBlur);
 elements.movieGrid.addEventListener("click", handleGridClick);
 elements.movieGrid.addEventListener("keydown", handleGridKeydown);
 elements.movieGrid.addEventListener("error", handlePosterImageError, true);
