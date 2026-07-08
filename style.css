@@ -863,6 +863,11 @@ textarea:focus {
   line-height: 1.2;
 }
 
+.detail-summary-meta {
+  display: none;
+  margin: 0;
+}
+
 .detail-date-row {
   position: relative;
   display: inline-flex;
@@ -1443,14 +1448,14 @@ small {
   }
 
   .detail-header {
-    min-height: 214px;
+    min-height: 184px;
     gap: 8px;
-    padding: 24px 18px 46px;
+    padding: 22px 18px 34px;
     background-position: 68% center;
   }
 
   .detail-heading {
-    gap: 9px;
+    gap: 7px;
     flex-basis: 58%;
     max-width: 60%;
     padding-top: 0;
@@ -1469,6 +1474,15 @@ small {
 
   .detail-year-pill {
     display: none;
+  }
+
+  .detail-summary-meta {
+    display: block;
+    color: #279fa1;
+    font-size: 0.78rem;
+    line-height: 1.2;
+    font-weight: 900;
+    opacity: 0.92;
   }
 
   .detail-date-row {
@@ -1502,14 +1516,14 @@ small {
   }
 
   .detail-info-card {
-    grid-template-columns: 92px minmax(0, 1fr);
-    gap: 12px;
-    padding: 16px;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 14px;
+    padding: 18px;
     border-radius: 24px;
   }
 
   .detail-poster-frame {
-    width: 92px;
+    width: 104px;
     min-height: auto;
     border-radius: 14px;
   }
@@ -1519,19 +1533,19 @@ small {
   }
 
   .detail-section-label {
-    margin-bottom: 2px;
-    font-size: 0.84rem;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
   }
 
   .detail-info-row {
-    grid-template-columns: 30px 54px minmax(86px, 1fr);
-    gap: 7px;
-    min-height: 46px;
+    grid-template-columns: 32px 58px minmax(86px, 1fr);
+    gap: 8px;
+    min-height: 50px;
   }
 
   .detail-info-icon {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 10px;
   }
 
@@ -1553,7 +1567,7 @@ small {
 
   .detail-info-label,
   .detail-info-value {
-    font-size: 0.8rem;
+    font-size: 0.84rem;
   }
 
   .detail-info-value {

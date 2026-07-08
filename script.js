@@ -45,6 +45,7 @@ const elements = {
   detailPoster: document.querySelector("#detailPoster"),
   detailReleaseYear: document.querySelector("#detailReleaseYear"),
   detailReview: document.querySelector("#detailReview"),
+  detailSummaryMeta: document.querySelector("#detailSummaryMeta"),
   detailTitle: document.querySelector("#detailTitle"),
   detailWatchedDate: document.querySelector("#detailWatchedDate"),
   emailInput: document.querySelector("#emailInput"),
@@ -633,6 +634,7 @@ function openDetail(movie) {
   elements.detailTitle.textContent = movie.title;
   elements.detailReleaseYear.textContent = movie.releaseYear;
   elements.detailWatchedDate.textContent = formatDate(movie.watchedDate);
+  elements.detailSummaryMeta.textContent = `${movie.releaseYear} · ${formatDate(movie.watchedDate)}`;
   elements.detailInfoReleaseYear.textContent = movie.releaseYear;
   elements.detailInfoWatchedDate.textContent = formatDate(movie.watchedDate);
   elements.detailReview.textContent = movie.review || "감상이 비어 있습니다.";
