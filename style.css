@@ -820,9 +820,9 @@ textarea:focus {
   align-items: flex-start;
   padding: 42px 46px 92px;
   background:
-    linear-gradient(90deg, rgba(10, 18, 31, 0.7) 0%, rgba(10, 18, 31, 0.34) 46%, rgba(10, 18, 31, 0.08) 78%),
-    linear-gradient(180deg, rgba(10, 18, 31, 0.04), rgba(191, 104, 61, 0.16)),
-    url("assets/images/autumn-night-header.png") center / cover no-repeat;
+    linear-gradient(90deg, rgba(255, 250, 241, 0.58) 0%, rgba(255, 250, 241, 0.3) 42%, rgba(255, 250, 241, 0.04) 82%),
+    linear-gradient(180deg, rgba(255, 250, 241, 0.04), rgba(120, 64, 35, 0.14)),
+    url("assets/images/autumn-detail-header.png") center / cover no-repeat;
   border-bottom: 0;
   box-shadow: inset 0 -1px 0 rgba(38, 59, 82, 0.14);
 }
@@ -947,10 +947,6 @@ textarea:focus {
   font-size: 1.1rem;
   backdrop-filter: blur(10px);
   pointer-events: auto;
-}
-
-.detail-summer-character {
-  display: none;
 }
 
 .icon-button {
@@ -1158,13 +1154,11 @@ small {
   content: "나의 한줄 메모";
   display: block;
   width: 100%;
-  padding: 0 0 12px 42px;
+  padding: 0 0 12px;
   border-bottom: 2px solid rgba(191, 104, 61, 0.48);
   color: #bf683d;
   font-size: 1.08rem;
   font-weight: 900;
-  background: url("assets/images/memo-leaf.png") left -6px top -8px / 38px auto no-repeat;
-  background-repeat: no-repeat;
 }
 
 .detail-content::after {
@@ -1175,8 +1169,12 @@ small {
   width: 62px;
   height: 26px;
   transform: rotate(18deg);
-  background: url("assets/images/memo-tape.png") center / contain no-repeat;
-  filter: drop-shadow(0 4px 8px rgba(214, 144, 116, 0.12));
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 248, 235, 0.18) 0 7px, transparent 7px 14px),
+    linear-gradient(135deg, #e6ad83, #c87850);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(130, 69, 42, 0.12);
+  opacity: 0.78;
 }
 
 .detail-review::before,
@@ -1189,19 +1187,19 @@ small {
 .detail-review::before {
   left: -30px;
   bottom: -26px;
-  width: 62px;
-  height: 48px;
-  background: url("assets/images/memo-shells.png") center / contain no-repeat;
-  opacity: 0.94;
+  width: 118px;
+  height: 94px;
+  background: url("assets/images/autumn-memo-left.png") left bottom / contain no-repeat;
+  opacity: 0.9;
 }
 
 .detail-review::after {
   right: -22px;
   bottom: -28px;
-  width: 86px;
-  height: 64px;
-  background: url("assets/images/memo-parasol.png") center / contain no-repeat;
-  opacity: 0.94;
+  width: 166px;
+  height: 132px;
+  background: url("assets/images/autumn-memo-right.png") right bottom / contain no-repeat;
+  opacity: 0.88;
 }
 
 .detail-review {
@@ -1212,7 +1210,7 @@ small {
   line-height: 1.98;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  padding: 2px 0 0;
+  padding: 2px 0 54px;
 }
 
 .detail-actions {
@@ -1607,10 +1605,6 @@ small {
     pointer-events: auto;
   }
 
-  .detail-summer-character {
-    display: none;
-  }
-
   .detail-info-card {
     grid-template-columns: 104px minmax(0, 1fr);
     gap: 14px;
@@ -1678,7 +1672,6 @@ small {
   }
 
   .detail-content::before {
-    padding-left: 36px;
     font-size: 0.98rem;
   }
 
@@ -1690,21 +1683,23 @@ small {
   }
 
   .detail-review::before {
-    left: -10px;
-    bottom: -48px;
-    transform: scale(0.64);
+    left: -8px;
+    bottom: -40px;
+    width: 92px;
+    height: 74px;
   }
 
   .detail-review::after {
     right: -14px;
-    bottom: -54px;
-    transform: scale(0.66);
-    transform-origin: right bottom;
+    bottom: -44px;
+    width: 132px;
+    height: 106px;
   }
 
   .detail-review {
     font-size: 0.98rem;
     line-height: 1.9;
+    padding-bottom: 48px;
   }
 
   .modal-backdrop {
