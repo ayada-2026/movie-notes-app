@@ -12,6 +12,7 @@ Each theme uses the same asset contract:
 
 ```text
 assets/themes/<season>/
+  app-icon.png
   main-header.*
   detail-header.png
   memo-left.png
@@ -26,6 +27,8 @@ When adding another season:
 3. Copy an existing theme block and change only its palette, image URLs, and image positions.
 4. Add the season's browser theme color to `theme-config.js`.
 5. Change `currentTheme` to the new season.
+6. Run `powershell -ExecutionPolicy Bypass -File scripts/generate-icons.ps1 -Theme <season>`.
+7. Change the icon cache version in `index.html` and `manifest.webmanifest` to the season name.
 
 Keep header compositions consistent so layout CSS does not need seasonal edits:
 
@@ -33,3 +36,4 @@ Keep header compositions consistent so layout CSS does not need seasonal edits:
 - Detail header: wide image with title-safe space on the left and the subject on the right.
 - Memo decorations: transparent PNGs with generous empty space around the object.
 - Memo tape: horizontal transparent PNG with a wide aspect ratio.
+- App icon: square PNG with important details inside the central safe area.
