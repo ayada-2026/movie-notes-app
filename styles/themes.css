@@ -1,0 +1,223 @@
+:root {
+  color-scheme: light;
+  --paper: var(--card);
+  --panel: var(--card);
+  --ink: var(--text);
+  --line: var(--border);
+  --accent-soft: var(--primary-soft);
+}
+
+:root,
+:root[data-theme="autumn"] {
+  --bg: #f2e9dc;
+  --bg-soft: #e5e5e0;
+  --bg-soft-rgb: 229, 229, 224;
+  --card: #fffaf1;
+  --card-rgb: 255, 250, 241;
+  --panel-rgb: 255, 253, 247;
+  --primary: #263b52;
+  --primary-rgb: 38, 59, 82;
+  --primary-soft: #e9ddd0;
+  --accent: #bf683d;
+  --accent-rgb: 191, 104, 61;
+  --accent-deep: #a85d39;
+  --accent-warm: #d99a5d;
+  --accent-warm-rgb: 217, 154, 93;
+  --accent-strong: #17283a;
+  --text: #202b38;
+  --muted: #766d66;
+  --border: #ded0c1;
+  --navy: #1c3045;
+  --sepia: #8b5d3d;
+  --warn: #a94f3b;
+  --danger-bg: #f6e9df;
+  --meta-text: #75695f;
+  --preview-text: #405064;
+  --on-primary: #f8fcfb;
+  --shadow: 0 18px 45px rgba(var(--primary-rgb), 0.16);
+
+  --detail-sky: #dce2e3;
+  --detail-mint: #e9e1d6;
+  --detail-sand: #fff2df;
+  --detail-ink: #1b2c40;
+  --detail-title: #4b281c;
+  --detail-meta: #6c4a39;
+  --detail-icon-bg: #ece3d8;
+  --detail-review-text: #344559;
+
+  --main-header-image: url("../assets/themes/autumn/main-header.png");
+  --main-header-position: center;
+  --main-header-mobile-position: 58% center;
+  --detail-header-image: url("../assets/themes/autumn/detail-header.png");
+  --detail-header-position: 60% 100%;
+  --detail-header-mobile-position: 60% 100%;
+  --memo-left-image: url("../assets/themes/autumn/memo-left.png");
+  --memo-right-image: url("../assets/themes/autumn/memo-right.png");
+  --memo-tape-image: url("../assets/themes/autumn/memo-tape.png");
+  --memo-heading-content: "🍂 나의 감상";
+  --memo-tape-right: 30px;
+  --memo-tape-top: 48px;
+  --memo-tape-width: 92px;
+  --memo-tape-height: 38px;
+  --memo-tape-rotation: -9deg;
+  --memo-left-x: -38px;
+  --memo-left-y: -44px;
+  --memo-left-width: 104px;
+  --memo-left-height: 80px;
+  --memo-left-rotation: -7deg;
+  --memo-right-x: -42px;
+  --memo-right-y: -58px;
+  --memo-right-width: 98px;
+  --memo-right-height: 82px;
+  --memo-right-rotation: 5deg;
+  --memo-tape-mobile-right: 18px;
+  --memo-tape-mobile-top: 38px;
+  --memo-tape-mobile-width: 74px;
+  --memo-tape-mobile-height: 30px;
+  --memo-left-mobile-x: -14px;
+  --memo-left-mobile-y: -54px;
+  --memo-left-mobile-width: 84px;
+  --memo-left-mobile-height: 66px;
+  --memo-right-mobile-x: -18px;
+  --memo-right-mobile-y: -68px;
+  --memo-right-mobile-width: 78px;
+  --memo-right-mobile-height: 66px;
+  --poster-frame-bg: #22394e;
+  --poster-detail-bg: #071324;
+  --poster-gradient-start: #1e344b;
+  --poster-gradient-mid: #466070;
+  --poster-gradient-end: #b66b43;
+  --empty-poster-start: #0e3f49;
+  --empty-poster-mid: #286978;
+  --empty-poster-end: #c0a164;
+  --edit-header-start-rgb: 232, 249, 250;
+  --edit-form-end-rgb: 250, 255, 251;
+
+  --main-header-overlay: linear-gradient(90deg, rgba(10, 18, 31, 0.72) 0%, rgba(10, 18, 31, 0.34) 42%, rgba(10, 18, 31, 0.04) 100%);
+  --main-header-wash: linear-gradient(180deg, rgba(10, 18, 31, 0.04), rgba(10, 18, 31, 0.2));
+  --main-header-border: rgba(var(--accent-warm-rgb), 0.28);
+  --main-header-shadow: 0 18px 42px rgba(28, 48, 69, 0.24);
+  --main-header-speckles:
+    radial-gradient(circle at 18% 16%, rgba(255, 237, 204, 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 28% 30%, rgba(255, 255, 255, 0.34) 0 1px, transparent 2px),
+    radial-gradient(circle at 44% 18%, rgba(255, 214, 154, 0.42) 0 1px, transparent 2px);
+  --hero-eyebrow: #e0a568;
+  --hero-title: #f8fcfb;
+  --hero-copy: rgba(255, 245, 228, 0.86);
+  --hero-line: rgba(224, 165, 104, 0.66);
+
+  --detail-header-overlay: linear-gradient(90deg, rgba(var(--card-rgb), 0.58) 0%, rgba(var(--card-rgb), 0.3) 42%, rgba(var(--card-rgb), 0.04) 82%);
+  --detail-header-wash: linear-gradient(180deg, rgba(var(--card-rgb), 0.04), rgba(120, 64, 35, 0.14));
+  --detail-heading-bg: rgba(var(--card-rgb), 0.9);
+  --detail-heading-border: rgba(255, 244, 224, 0.56);
+  --detail-heading-shadow: 0 16px 30px rgba(10, 18, 31, 0.16);
+  --memo-line: rgba(var(--accent-warm-rgb), 0.2);
+  --memo-heading-line: rgba(var(--accent-rgb), 0.48);
+}
+
+:root[data-theme="summer"] {
+  --bg: #f7f1e6;
+  --bg-soft: #eaf5f7;
+  --bg-soft-rgb: 234, 245, 247;
+  --card: #fffdf7;
+  --card-rgb: 255, 253, 247;
+  --panel-rgb: 255, 253, 247;
+  --primary: #0e5a66;
+  --primary-rgb: 14, 90, 102;
+  --primary-soft: #d6eef1;
+  --accent: #6fb7c8;
+  --accent-rgb: 111, 183, 200;
+  --accent-deep: #287786;
+  --accent-warm: #d8b879;
+  --accent-warm-rgb: 216, 184, 121;
+  --accent-strong: #073f49;
+  --text: #172331;
+  --muted: #6e7c83;
+  --border: #d8e1de;
+  --navy: #123f55;
+  --sepia: #8c7442;
+  --warn: #b4594f;
+  --danger-bg: #f8e9e4;
+  --meta-text: #6e7c83;
+  --preview-text: #405a67;
+  --on-primary: #f8fcfb;
+  --shadow: 0 18px 45px rgba(var(--primary-rgb), 0.16);
+
+  --detail-sky: #eaf5f7;
+  --detail-mint: #dff1ec;
+  --detail-sand: #fff6e5;
+  --detail-ink: #173344;
+  --detail-title: #123f55;
+  --detail-meta: #526f78;
+  --detail-icon-bg: #e4f3f1;
+  --detail-review-text: #344f5d;
+
+  --main-header-image: url("../assets/themes/summer/main-header.jpg");
+  --main-header-position: center;
+  --main-header-mobile-position: 58% center;
+  --detail-header-image: url("../assets/themes/summer/detail-header.png");
+  --detail-header-position: 60% 100%;
+  --detail-header-mobile-position: 60% 100%;
+  --memo-left-image: url("../assets/themes/summer/memo-left.png");
+  --memo-right-image: url("../assets/themes/summer/memo-right.png");
+  --memo-tape-image: url("../assets/themes/summer/memo-tape.png");
+  --memo-heading-content: "🍃 나의 감상";
+  --memo-tape-right: 30px;
+  --memo-tape-top: 48px;
+  --memo-tape-width: 82px;
+  --memo-tape-height: 34px;
+  --memo-tape-rotation: 9deg;
+  --memo-left-x: -30px;
+  --memo-left-y: -44px;
+  --memo-left-width: 72px;
+  --memo-left-height: 56px;
+  --memo-left-rotation: -4deg;
+  --memo-right-x: -36px;
+  --memo-right-y: -56px;
+  --memo-right-width: 92px;
+  --memo-right-height: 70px;
+  --memo-right-rotation: 4deg;
+  --memo-tape-mobile-right: 18px;
+  --memo-tape-mobile-top: 38px;
+  --memo-tape-mobile-width: 68px;
+  --memo-tape-mobile-height: 28px;
+  --memo-left-mobile-x: -10px;
+  --memo-left-mobile-y: -54px;
+  --memo-left-mobile-width: 64px;
+  --memo-left-mobile-height: 50px;
+  --memo-right-mobile-x: -16px;
+  --memo-right-mobile-y: -66px;
+  --memo-right-mobile-width: 82px;
+  --memo-right-mobile-height: 64px;
+  --poster-frame-bg: #174b58;
+  --poster-detail-bg: #082f3a;
+  --poster-gradient-start: #0e3f49;
+  --poster-gradient-mid: #286978;
+  --poster-gradient-end: #c0a164;
+  --empty-poster-start: #0e3f49;
+  --empty-poster-mid: #286978;
+  --empty-poster-end: #c0a164;
+  --edit-header-start-rgb: 234, 245, 247;
+  --edit-form-end-rgb: 250, 255, 251;
+
+  --main-header-overlay: linear-gradient(90deg, rgba(8, 49, 61, 0.7) 0%, rgba(8, 49, 61, 0.28) 42%, rgba(8, 49, 61, 0.03) 100%);
+  --main-header-wash: linear-gradient(180deg, rgba(8, 49, 61, 0.02), rgba(8, 49, 61, 0.15));
+  --main-header-border: rgba(var(--accent-rgb), 0.3);
+  --main-header-shadow: 0 18px 42px rgba(var(--primary-rgb), 0.22);
+  --main-header-speckles:
+    radial-gradient(circle at 18% 16%, rgba(234, 250, 255, 0.56) 0 1px, transparent 2px),
+    radial-gradient(circle at 28% 30%, rgba(255, 255, 255, 0.42) 0 1px, transparent 2px),
+    radial-gradient(circle at 44% 18%, rgba(214, 238, 241, 0.48) 0 1px, transparent 2px);
+  --hero-eyebrow: #d8b879;
+  --hero-title: #f8fcfb;
+  --hero-copy: rgba(234, 245, 247, 0.9);
+  --hero-line: rgba(111, 183, 200, 0.72);
+
+  --detail-header-overlay: linear-gradient(90deg, rgba(var(--card-rgb), 0.58) 0%, rgba(var(--card-rgb), 0.3) 42%, rgba(var(--card-rgb), 0.04) 82%);
+  --detail-header-wash: linear-gradient(180deg, rgba(var(--card-rgb), 0.02), rgba(var(--accent-rgb), 0.12));
+  --detail-heading-bg: rgba(var(--card-rgb), 0.9);
+  --detail-heading-border: rgba(234, 245, 247, 0.66);
+  --detail-heading-shadow: 0 16px 30px rgba(7, 63, 73, 0.14);
+  --memo-line: rgba(var(--accent-warm-rgb), 0.18);
+  --memo-heading-line: rgba(var(--accent-rgb), 0.5);
+}
