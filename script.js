@@ -93,6 +93,32 @@ function normalizeText(value) {
   return value.trim().replace(/\s+/g, " ");
 }
 
+function normalizeMultilineText(value) {
+  return value
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trim();
+}
+
+function formatReviewForReading(value) {
+  const normalized = normalizeMultilineText(value);
+
+  if (!normalized || normalized.includes("\n")) {
+    return normalized;
+  }
+
+  if (typeof Intl.Segmenter === "function") {
+    return [...new Intl.Segmenter("ko", { granularity: "sentence" }).segment(normalized)]
+      .map(({ segment }) => segment.trim())
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  return normalized.replace(/([.!?。！？]+)\s+/g, "$1\n");
+}
+
 function normalizeDateInput(value) {
   const compact = value.trim().replace(/[.\s/]/g, "-");
   const digits = value.replace(/\D/g, "");
@@ -219,7 +245,7 @@ function movieToDbPayload(posterValue) {
     title: normalizeText(elements.titleInput.value),
     release_year: Number(elements.releaseYearInput.value),
     watched_date: normalizeDateInput(elements.watchedDateInput.value),
-    review: normalizeText(elements.reviewInput.value),
+    review: normalizeMultilineText(elements.reviewInput.value),
     poster: posterValue || null,
   };
 }
@@ -630,7 +656,7 @@ function openModal(movie = null) {
     elements.watchedDateInput.value = movie.watchedDate;
     elements.posterCurrentValue.value = movie.poster || "";
     elements.posterInput.value = isExternalPoster(movie.poster) ? movie.poster : "";
-    elements.reviewInput.value = movie.review;
+    elements.reviewInput.value = formatReviewForReading(movie.review);
     updatePosterHelp(movie);
   } else {
     elements.modalTitle.textContent = "새 영화 기록";
@@ -657,7 +683,8 @@ function openDetail(movie) {
   elements.detailSummaryMeta.textContent = `${movie.releaseYear} · ${formatDate(movie.watchedDate)}`;
   elements.detailInfoReleaseYear.textContent = movie.releaseYear;
   elements.detailInfoWatchedDate.textContent = formatDate(movie.watchedDate);
-  elements.detailReview.textContent = movie.review || "감상이 비어 있습니다.";
+  elements.detailReview.textContent =
+    formatReviewForReading(movie.review) || "감상이 비어 있습니다.";
   elements.detailPoster.innerHTML = renderPosterMarkup(movie, "poster-frame detail-poster-frame");
   elements.detailModal.classList.remove("is-hidden");
 
